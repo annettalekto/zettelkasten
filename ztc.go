@@ -9,11 +9,12 @@ import (
 func main() {
 	a := app.New()
 	w := a.NewWindow("Zettelkasten")
-	w.Resize(fyne.NewSize(800, 600))
+	w.Resize(fyne.NewSize(700, 500))
 
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
+	// тест git
 
-	w.SetContent(widget.NewLabel("Let's start..."))
+	w.SetContent(widget.NewLabel("Let's start!"))
 	w.ShowAndRun()
 }
