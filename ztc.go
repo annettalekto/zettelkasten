@@ -11,6 +11,9 @@ func main() {
 	w := a.NewWindow("Zettelkasten")
 	w.Resize(fyne.NewSize(800, 600))
 
+	// прога для работы с сиситемой Zettelkasten
+	// будет сохранять файлы в определенном виде, ну и читать их
+
 	w.SetContent(widget.NewLabel("Let's start..."))
 	w.ShowAndRun()
 }
