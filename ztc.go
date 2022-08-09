@@ -14,6 +14,7 @@ func main() {
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
 	// тест git
+	// тест branch, этот коммит для ветки main
 
 	w.SetContent(widget.NewLabel("Let's start!"))
 	w.ShowAndRun()
