@@ -7,10 +7,12 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
+
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -52,7 +54,7 @@ func main() {
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
 
-	w.SetContent(widget.NewLabel("Let's start!"))
+	w.SetContent(form())
 	w.ShowAndRun()
 }
 
@@ -97,4 +99,35 @@ func abautProgramm() {
 	// w.SetContent(fyne.NewContainerWithLayout(layout.NewCenterLayout(), box))
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
+}
+
+func face() *fyne.Container {
+	serchEntry := widget.NewEntry()
+	btnOpen := widget.NewButton("Открыть", nil)
+	btnSave := widget.NewButton("Сохранить", nil)
+
+	btnBox := container.NewHBox(btnOpen, btnSave)
+	box := container.NewVBox(serchEntry, btnBox)
+	return box
+}
+
+func form() *fyne.Container {
+	titleEntry := widget.NewEntry()
+	titleEntry.PlaceHolder = "Заголовок"
+	// titleEntry.OnChanged
+	hash := widget.NewEntry()
+	hash.PlaceHolder = "#хеш"
+	boxTop := container.NewVBox(titleEntry, hash)
+
+	textEntry := widget.NewEntry()
+	boxEntry := container.NewMax(textEntry)
+
+	link := widget.NewEntry()
+	link.PlaceHolder = "Ссылка"
+
+	btnSave := widget.NewButton("Сохранить", nil)
+	boxBottom := container.NewVBox(link, btnSave)
+
+	box := container.NewHBox(boxTop, boxEntry, boxBottom)
+	return box
 }
