@@ -1,0 +1,9 @@
+*.exe
+*.txt
+
+#*.toml
+upp.toml
+
+toml/
+.svn/
+.vscode/
