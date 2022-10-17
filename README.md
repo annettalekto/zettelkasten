@@ -1,2 +1,2 @@
 # zettelkasten
-Write your notes for the Zettelkasten method
+Save your notes for the Zettelkasten method
