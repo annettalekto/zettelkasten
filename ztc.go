@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -52,7 +53,7 @@ func main() {
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
 
-	w.SetContent(form())
+	w.SetContent(mainForm())
 	w.ShowAndRun()
 }
 
@@ -107,6 +108,23 @@ func face() *fyne.Container {
 	btnBox := container.NewHBox(btnOpen, btnSave)
 	box := container.NewVBox(serchEntry, btnBox)
 	return box
+}
+
+func mainForm() (box *fyne.Container) {
+
+	openBtn := widget.NewButton("Открыть", func() {
+		openFile := func(r fyne.URIReadCloser, _ error) {
+			fmt.Println(r.URI())
+		}
+		w := fyne.CurrentApp().Driver().AllWindows()[0]
+		dialog := dialog.NewFileOpen(openFile, w)
+		dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+		dialog.Show()
+	})
+
+	box = container.NewVBox(openBtn)
+	// box.Add(openBtn)
+	return
 }
 
 func form() *fyne.Container {
