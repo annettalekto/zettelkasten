@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os/exec"
 	"time"
 
@@ -113,7 +115,18 @@ func mainForm() (box *fyne.Container) {
 		dialog.Show()
 	})
 
-	box = container.NewVBox(openBtn)
+	getFileList := widget.NewButton("Файлы получить", func() {
+		files, err := ioutil.ReadDir(".")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, file := range files {
+			fmt.Println(file.Name(), file.IsDir())
+		}
+	})
+
+	box = container.NewVBox(openBtn, getFileList)
 	// box.Add(openBtn)
 	return
 }
