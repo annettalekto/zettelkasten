@@ -5,6 +5,9 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/widget"
 )
 
 type fileType struct {
@@ -16,36 +19,33 @@ type fileType struct {
 	data        time.Time
 }
 
-// перевести файлы на .csv
 /*
 todo
+перевести доп файлы на .csv
 link
 день недели убрать из даты
+NewEntryWithData
 */
 
-var base []fileType
+// var base []fileType
 
-func fileRead(fileName string) {
-	bs, err := os.ReadFile(fileName)
-
+func fileRead(fileName string) (f fileType) {
+	bytes, err := os.ReadFile(fileName)
 	if err != nil {
+		// todo add status line
 		return
 	}
-	str := string(bs)
-	sl := strings.Split(str, "\n")
+	text := strings.Split(string(bytes), "\n")
 
-	for i, line := range sl {
+	for i, line := range text { //отладка
 		fmt.Printf("%d: %s\n", i, string(line))
 	}
-	///---------------
 
-	var val fileType
+	f.fileName = fileName
 
-	val.fileName = fileName
-
-	for _, line := range sl {
+	for _, line := range text {
 		if strings.Contains(line, "topic:") {
-			val.topic = strings.TrimPrefix(line, "topic: ")
+			f.topic = strings.TrimPrefix(line, "topic: ")
 		}
 
 		if strings.Contains(line, "#") {
@@ -53,14 +53,14 @@ func fileRead(fileName string) {
 			for _, s := range slice {
 				if s != "" && s != "\r" {
 					s = strings.TrimSuffix(s, " ")
-					val.tag = append(val.tag, s)
+					f.tag = append(f.tag, s)
 				}
 			}
 		}
 
 		if strings.Contains(line, "link:") {
 			s := strings.TrimSuffix(line, "\r")
-			val.link = strings.TrimPrefix(s, "link: ")
+			f.link = strings.TrimPrefix(s, "link: ")
 		}
 
 		if strings.Contains(line, "[") { // todo парс строк
@@ -69,7 +69,7 @@ func fileRead(fileName string) {
 				s = strings.TrimSuffix(s, "\r")
 				s = strings.TrimSuffix(s, "]")
 				if s != "" {
-					val.bindingFile = append(val.bindingFile, s)
+					f.bindingFile = append(f.bindingFile, s)
 				}
 			}
 		}
@@ -80,9 +80,49 @@ func fileRead(fileName string) {
 			d, err := time.Parse("2006.01.02 15:04", s)
 			fmt.Println("v", d.Weekday())
 			fmt.Println(d, err)
-			val.data = d
+			f.data = d
 		}
 	}
 
-	base = append(base, val)
+	// base = append(base, val)
+	return
+}
+
+func getText(fileName string) (fileText string) {
+
+	bytes, err := os.ReadFile(fileName)
+	if err != nil {
+		return
+	}
+	text := strings.Split(string(bytes), "\n")
+
+	copy := false
+	for _, line := range text {
+
+		if copy {
+			if strings.Contains(line, "_____") {
+				break
+			}
+			fileText += line + "\r\n"
+		}
+		if strings.Contains(line, "_____") {
+			copy = true
+		}
+	}
+
+	return
+}
+
+func textEditor(text string) { // текст должен сохранять форматирование
+	// в разных окнах расположить остальные элементы
+
+	w := fyne.CurrentApp().NewWindow("Типо текстовый редактор")
+	w.Resize(fyne.NewSize(800, 600))
+
+	textEntry := widget.NewMultiLineEntry()
+	textEntry.Wrapping = fyne.TextWrapBreak
+	textEntry.SetText(text)
+
+	w.SetContent(textEntry)
+	w.ShowAndRun()
 }
