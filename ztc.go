@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"time"
 
@@ -106,15 +106,20 @@ func abautProgramm() {
 }
 
 func mainForm() (box *container.Split) {
+	var selectedFile string
 
 	openButton := widget.NewButton("Открыть", func() {
-
+		text := getText(selectedFile)
+		data := fileRead(selectedFile)
+		textEditor(data, text)
 	})
 	createButton := widget.NewButton("Создать", nil)
 	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
 
-	dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
-	files, err := ioutil.ReadDir(dir)
+	// dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	dir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
+
+	files, err := os.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -138,43 +143,25 @@ func mainForm() (box *container.Split) {
 	// topBox := container.NewVBox(dirBox)
 
 	fileNameEntry := widget.NewEntry()
+	fileNameEntry.TextStyle.Monospace = true
 	fileNameSearchButton := widget.NewButton("Поиск", nil)
 	topicEntry := widget.NewEntry()
+	topicEntry.TextStyle.Monospace = true
 	topicSearchButton := widget.NewButton("Поиск", nil)
 	tagEntry := widget.NewEntry()
+	tagEntry.TextStyle.Monospace = true
 	tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
 	dateEntry := widget.NewEntry()
+	dateEntry.TextStyle.Monospace = true
 	dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
-	searchBox := container.NewGridWithColumns(3,
-		widget.NewLabel("Имя: "), fileNameEntry, fileNameSearchButton,
-		widget.NewLabel("Тема: "), topicEntry, topicSearchButton,
-		widget.NewLabel("Теги: "), tagEntry, tagSearchButton,
-		widget.NewLabel("Дата: "), dateEntry, dateSearchButton,
+
+	searchBox := container.NewVBox(
+		label(""),
+		container.NewBorder(nil, nil, label("Имя:  "), fileNameSearchButton, fileNameEntry),
+		container.NewBorder(nil, nil, label("Тема: "), topicSearchButton, topicEntry),
+		container.NewBorder(nil, nil, label("Теги: "), tagSearchButton, tagEntry),
+		container.NewBorder(nil, nil, label("Дата: "), dateSearchButton, dateEntry),
 	)
-
-	// searchBox := container.NewVBox(
-	// 	container.NewHBox(widget.NewLabel("Имя:  "), fileNameEntry, fileNameSearchButton),
-	// 	container.NewHBox(widget.NewLabel("Тема: "), topicEntry, topicSearchButton),
-	// 	container.NewHBox(widget.NewLabel("Теги: "), tagEntry, tagSearchButton),
-	// 	container.NewHBox(widget.NewLabel("Дата: "), dateEntry, dateSearchButton),
-	// )
-
-	// searchBox := container.NewHBox(
-	// 	container.NewVBox(widget.NewLabel("Имя:  "), widget.NewLabel("Тема:  "), widget.NewLabel("Теги:  "), widget.NewLabel("Дата:  ")),
-	// 	container.NewVBox(fileNameEntry, topicEntry, tagEntry, dateEntry),
-	// 	container.NewVBox(fileNameSearchButton, topicSearchButton, tagSearchButton, dateSearchButton),
-	// )
-
-	// entryBox := container.NewGridWithColumns(2,
-	// 	fileNameEntry, fileNameSearchButton,
-	// 	topicEntry, topicSearchButton,
-	// 	tagEntry, tagSearchButton,
-	// 	dateEntry, dateSearchButton,
-	// )
-	// searchBox := container.NewHBox(
-	// 	container.NewVBox(widget.NewLabel("Имя:  "), widget.NewLabel("Тема:  "), widget.NewLabel("Теги:  "), widget.NewLabel("Дата:  ")),
-	// 	container.NewVBox(entryBox),
-	// )
 
 	list := widget.NewList(
 		func() int {
@@ -195,9 +182,10 @@ func mainForm() (box *container.Split) {
 	list.OnSelected = func(id widget.ListItemID) {
 		filePath := dir + "\\" + files[id].Name()
 		data := fileRead(filePath)
-		fileNameEntry.SetText(data.fileName)
+		selectedFile = data.fileName
+		fileNameEntry.SetText(files[id].Name()) // только имя todo
 		topicEntry.SetText(data.topic)
-		tagEntry.SetText(data.tag[0])
+		tagEntry.SetText(data.tag[0]) // todo все, с #, с пробелом?
 		dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
 	}
 

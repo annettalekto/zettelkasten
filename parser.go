@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -78,8 +79,11 @@ func fileRead(fileName string) (f fileType) {
 		}
 
 		if strings.Contains(line, "data:") {
+			// если есть дол. символы Parse не работает
 			s := strings.TrimPrefix(line, "data: ")
+
 			s = strings.TrimSuffix(s, "\r")
+			s = strings.TrimSpace(s)
 			d, err := time.Parse("2006.01.02 15:04", s)
 			fmt.Println("v", d.Weekday())
 			fmt.Println(d, err)
@@ -116,16 +120,49 @@ func getText(fileName string) (fileText string) {
 	return
 }
 
-func textEditor(text string) { // текст должен сохранять форматирование
+func label(labelName string) *widget.Label {
+	l := widget.NewLabel(labelName)
+	l.TextStyle.Monospace = true
+	return l
+}
+
+func textEditor(data fileType, text string) { // текст должен сохранять форматирование
 	// в разных окнах расположить остальные элементы
 
 	w := fyne.CurrentApp().NewWindow("Типо текстовый редактор")
+	w.CenterOnScreen()
 	w.Resize(fyne.NewSize(800, 600))
 
+	fileNameEntry := widget.NewEntry()
+	fileNameEntry.TextStyle.Monospace = true
+	topicEntry := widget.NewEntry()
+	topicEntry.TextStyle.Monospace = true
+	tagEntry := widget.NewEntry()
+	tagEntry.TextStyle.Monospace = true
+	dateEntry := widget.NewEntry()
+	dateEntry.TextStyle.Monospace = true
+
+	searchBox := container.NewVBox(
+		container.NewBorder(nil, nil, label("Имя:  "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, label("Тема: "), nil, topicEntry),
+		container.NewBorder(nil, nil, label("Теги: "), nil, tagEntry),
+		container.NewBorder(nil, nil, label("Дата: "), nil, dateEntry),
+	)
+
+	fileNameEntry.SetText(data.fileName) // только имя todo
+	topicEntry.SetText(data.topic)
+	tagEntry.SetText(data.tag[0]) // todo все, с #, с пробелом?
+	dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
+
 	textEntry := widget.NewMultiLineEntry()
+	textEntry.TextStyle.Monospace = true
 	textEntry.Wrapping = fyne.TextWrapBreak
 	textEntry.SetText(text)
 
-	w.SetContent(textEntry)
-	w.ShowAndRun()
+	saveButton := widget.NewButton("Сохранить", func() {
+	})
+
+	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, saveButton), nil, nil, textEntry)
+	w.SetContent(box)
+	w.Show() // ShowAndRun -- panic!
 }
