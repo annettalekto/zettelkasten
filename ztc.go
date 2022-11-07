@@ -21,7 +21,7 @@ import (
 var gVersion, gYear, gProgramName string
 
 func main() {
-	gProgramName = "Электронная имитация параметров"
+	gProgramName = "Zettelkasten"
 
 	a := app.New()
 	w := a.NewWindow(gProgramName)
@@ -55,6 +55,8 @@ func main() {
 
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
+	// Открыть: выбранный из списка файл в редакторе с возможностью сохранения
+	// Создать: ввод текста и доп. данных, сохранение в формате, запись в список тегов и тд
 
 	w.SetContent(mainForm())
 	w.ShowAndRun()
@@ -106,15 +108,7 @@ func abautProgramm() {
 func mainForm() (box *container.Split) {
 
 	openButton := widget.NewButton("Открыть", func() {
-		// DEBUG если выбрано Закрыть, уходит в panic
-		openFile := func(r fyne.URIReadCloser, _ error) {
-			fmt.Println(r.URI())
-		}
-		w := fyne.CurrentApp().Driver().AllWindows()[0]
 
-		dialog := dialog.NewFileOpen(openFile, w)
-		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
-		dialog.Show()
 	})
 	createButton := widget.NewButton("Создать", nil)
 	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
@@ -129,12 +123,58 @@ func mainForm() (box *container.Split) {
 	}
 	dirLabel := widget.NewLabel(dir)
 	dirButton := widget.NewButton("Каталог", func() {
-		//
-	})
-	dirBox := container.NewHBox(dirLabel, dirButton)
+		// как настроить на каталог?
+		// DEBUG если выбрано Закрыть, уходит в panic
+		openFile := func(r fyne.URIReadCloser, _ error) {
+			fmt.Println(r.URI())
+		}
+		w := fyne.CurrentApp().Driver().AllWindows()[0]
 
-	fileNameLabel := widget.NewLabel("")
-	topBox := container.NewVBox(dirBox, fileNameLabel)
+		dialog := dialog.NewFileOpen(openFile, w)
+		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+		dialog.Show()
+	})
+	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
+	// topBox := container.NewVBox(dirBox)
+
+	fileNameEntry := widget.NewEntry()
+	fileNameSearchButton := widget.NewButton("Поиск", nil)
+	topicEntry := widget.NewEntry()
+	topicSearchButton := widget.NewButton("Поиск", nil)
+	tagEntry := widget.NewEntry()
+	tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
+	dateEntry := widget.NewEntry()
+	dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
+	searchBox := container.NewGridWithColumns(3,
+		widget.NewLabel("Имя: "), fileNameEntry, fileNameSearchButton,
+		widget.NewLabel("Тема: "), topicEntry, topicSearchButton,
+		widget.NewLabel("Теги: "), tagEntry, tagSearchButton,
+		widget.NewLabel("Дата: "), dateEntry, dateSearchButton,
+	)
+
+	// searchBox := container.NewVBox(
+	// 	container.NewHBox(widget.NewLabel("Имя:  "), fileNameEntry, fileNameSearchButton),
+	// 	container.NewHBox(widget.NewLabel("Тема: "), topicEntry, topicSearchButton),
+	// 	container.NewHBox(widget.NewLabel("Теги: "), tagEntry, tagSearchButton),
+	// 	container.NewHBox(widget.NewLabel("Дата: "), dateEntry, dateSearchButton),
+	// )
+
+	// searchBox := container.NewHBox(
+	// 	container.NewVBox(widget.NewLabel("Имя:  "), widget.NewLabel("Тема:  "), widget.NewLabel("Теги:  "), widget.NewLabel("Дата:  ")),
+	// 	container.NewVBox(fileNameEntry, topicEntry, tagEntry, dateEntry),
+	// 	container.NewVBox(fileNameSearchButton, topicSearchButton, tagSearchButton, dateSearchButton),
+	// )
+
+	// entryBox := container.NewGridWithColumns(2,
+	// 	fileNameEntry, fileNameSearchButton,
+	// 	topicEntry, topicSearchButton,
+	// 	tagEntry, tagSearchButton,
+	// 	dateEntry, dateSearchButton,
+	// )
+	// searchBox := container.NewHBox(
+	// 	container.NewVBox(widget.NewLabel("Имя:  "), widget.NewLabel("Тема:  "), widget.NewLabel("Теги:  "), widget.NewLabel("Дата:  ")),
+	// 	container.NewVBox(entryBox),
+	// )
 
 	list := widget.NewList(
 		func() int {
@@ -153,12 +193,19 @@ func mainForm() (box *container.Split) {
 		})
 
 	list.OnSelected = func(id widget.ListItemID) {
-		fileNameLabel.SetText(files[id].Name())
-		fileNameLabel.Refresh()
+		filePath := dir + "\\" + files[id].Name()
+		data := fileRead(filePath)
+		fileNameEntry.SetText(data.fileName)
+		topicEntry.SetText(data.topic)
+		tagEntry.SetText(data.tag[0])
+		dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
 	}
 
-	elementsBox := container.NewBorder(topBox, bottomBox, nil, nil)
-	box = container.NewHSplit(list, elementsBox)
+	// panelBox := container.NewBorder(container.NewVBox(dirBox, searchBox), bottomBox, nil, nil)
+	// panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, container.NewVBox(searchBox))
+	panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, searchBox)
+
+	box = container.NewHSplit(list, panelBox)
 
 	return
 }

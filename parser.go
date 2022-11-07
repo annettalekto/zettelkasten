@@ -16,14 +16,17 @@ type fileType struct {
 	tag         []string
 	link        string
 	bindingFile []string
-	data        time.Time
+	date        time.Time
 }
 
 /*
 todo
++конвертировать все файлы - избавиться от BOM \ufeff
++день недели убрать из даты
++link
+теги то с большой то с маленькой буквы
+
 перевести доп файлы на .csv
-link
-день недели убрать из даты
 NewEntryWithData
 */
 
@@ -80,7 +83,7 @@ func fileRead(fileName string) (f fileType) {
 			d, err := time.Parse("2006.01.02 15:04", s)
 			fmt.Println("v", d.Weekday())
 			fmt.Println(d, err)
-			f.data = d
+			f.date = d
 		}
 	}
 
