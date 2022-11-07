@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -24,7 +25,7 @@ func main() {
 
 	a := app.New()
 	w := a.NewWindow(gProgramName)
-	w.Resize(fyne.NewSize(700, 500))
+	w.Resize(fyne.NewSize(800, 600))
 	w.CenterOnScreen()
 	w.SetMaster()
 
@@ -102,9 +103,10 @@ func abautProgramm() {
 	w.Show() // ShowAndRun -- panic!
 }
 
-func mainForm() (box *fyne.Container) {
+func mainForm() (box *container.Split) {
 
-	openBtn := widget.NewButton("Открыть", func() {
+	openButton := widget.NewButton("Открыть", func() {
+		// DEBUG если выбрано Закрыть, уходит в panic
 		openFile := func(r fyne.URIReadCloser, _ error) {
 			fmt.Println(r.URI())
 		}
@@ -114,20 +116,50 @@ func mainForm() (box *fyne.Container) {
 		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
 		dialog.Show()
 	})
+	createButton := widget.NewButton("Создать", nil)
+	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
 
-	getFileList := widget.NewButton("Файлы получить", func() {
-		files, err := ioutil.ReadDir(".")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for _, file := range files {
-			fmt.Println(file.Name(), file.IsDir())
-		}
+	dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		fmt.Println(file.Name(), file.IsDir())
+	}
+	dirLabel := widget.NewLabel(dir)
+	dirButton := widget.NewButton("Каталог", func() {
+		//
 	})
+	dirBox := container.NewHBox(dirLabel, dirButton)
 
-	box = container.NewVBox(openBtn, getFileList)
-	// box.Add(openBtn)
+	fileNameLabel := widget.NewLabel("")
+	topBox := container.NewVBox(dirBox, fileNameLabel)
+
+	list := widget.NewList(
+		func() int {
+			return len(files)
+		},
+		func() fyne.CanvasObject {
+			var style fyne.TextStyle
+			style.Monospace = true
+			temp := widget.NewLabelWithStyle("temp", fyne.TextAlignLeading, style)
+			return temp
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			if i < len(files) {
+				o.(*widget.Label).SetText(files[i].Name())
+			}
+		})
+
+	list.OnSelected = func(id widget.ListItemID) {
+		fileNameLabel.SetText(files[id].Name())
+		fileNameLabel.Refresh()
+	}
+
+	elementsBox := container.NewBorder(topBox, bottomBox, nil, nil)
+	box = container.NewHSplit(list, elementsBox)
+
 	return
 }
 
