@@ -106,20 +106,19 @@ func abautProgramm() {
 }
 
 func mainForm() (box *container.Split) {
-	var selectedFile string
+	// selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
 	openButton := widget.NewButton("Открыть", func() {
-		text := getText(selectedFile)
-		data := fileRead(selectedFile)
+		filePath := selectedDir + "\\" + selectedFile.fileName
+		text := getText(filePath)
+		data := fileRead(filePath)
 		textEditor(data, text)
 	})
 	createButton := widget.NewButton("Создать", nil)
 	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
 
-	dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
-	// dir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
-
-	files, err := os.ReadDir(dir)
+	files, err := os.ReadDir(selectedDir)
 	if err != nil {
 		fmt.Printf("Ошибка: рабочая папка не открыта\n")
 		log.Fatal(err)
@@ -127,7 +126,7 @@ func mainForm() (box *container.Split) {
 	for _, file := range files {
 		fmt.Println(file.Name(), file.IsDir())
 	}
-	dirLabel := widget.NewLabel(dir)
+	dirLabel := widget.NewLabel(selectedDir)
 	dirButton := widget.NewButton("Каталог", func() {
 		// как настроить на каталог?
 		// DEBUG если выбрано Закрыть, уходит в panic
@@ -181,13 +180,19 @@ func mainForm() (box *container.Split) {
 		})
 
 	list.OnSelected = func(id widget.ListItemID) {
-		filePath := dir + "\\" + files[id].Name()
-		data := fileRead(filePath)
-		selectedFile = data.fileName
-		fileNameEntry.SetText(files[id].Name()) // только имя todo
-		topicEntry.SetText(data.topic)
-		tagEntry.SetText(data.tag[0]) // todo все, с #, с пробелом?
-		dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
+
+		filePath := selectedDir + "\\" + files[id].Name()
+		selectedFile = fileRead(filePath)
+		selectedFile.fileName = files[id].Name() // todo
+
+		tags := ""
+		for _, tag := range selectedFile.tag {
+			tags += "#" + tag + " "
+		}
+		tagEntry.SetText(tags)
+		fileNameEntry.SetText(files[id].Name())
+		topicEntry.SetText(selectedFile.topic)
+		dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
 	}
 
 	// panelBox := container.NewBorder(container.NewVBox(dirBox, searchBox), bottomBox, nil, nil)

@@ -20,6 +20,9 @@ type fileType struct {
 	date        time.Time
 }
 
+var selectedDir string
+var selectedFile fileType
+
 /*
 todo
 +конвертировать все файлы - избавиться от BOM \ufeff
@@ -33,8 +36,8 @@ NewEntryWithData
 
 // var base []fileType
 
-func fileRead(fileName string) (f fileType) {
-	bytes, err := os.ReadFile(fileName)
+func fileRead(filePath string) (f fileType) {
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		// todo add status line
 		return
@@ -45,7 +48,7 @@ func fileRead(fileName string) (f fileType) {
 	// 	fmt.Printf("%d: %s\n", i, string(line))
 	// }
 
-	f.fileName = fileName
+	f.fileName = filePath // todo
 
 	for _, line := range text {
 		if strings.Contains(line, "topic:") {
@@ -95,9 +98,9 @@ func fileRead(fileName string) (f fileType) {
 	return
 }
 
-func getText(fileName string) (fileText string) {
+func getText(filePath string) (fileText string) {
 
-	bytes, err := os.ReadFile(fileName)
+	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return
 	}
