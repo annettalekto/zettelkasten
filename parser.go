@@ -41,9 +41,9 @@ func fileRead(fileName string) (f fileType) {
 	}
 	text := strings.Split(string(bytes), "\n")
 
-	for i, line := range text { //отладка
-		fmt.Printf("%d: %s\n", i, string(line))
-	}
+	// for i, line := range text { //отладка
+	// 	fmt.Printf("%d: %s\n", i, string(line))
+	// }
 
 	f.fileName = fileName
 

@@ -116,11 +116,12 @@ func mainForm() (box *container.Split) {
 	createButton := widget.NewButton("Создать", nil)
 	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
 
-	// dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
-	dir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
+	dir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	// dir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
 	files, err := os.ReadDir(dir)
 	if err != nil {
+		fmt.Printf("Ошибка: рабочая папка не открыта\n")
 		log.Fatal(err)
 	}
 	for _, file := range files {
