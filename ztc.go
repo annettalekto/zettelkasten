@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -106,13 +107,12 @@ func abautProgramm() {
 }
 
 func mainForm() (box *container.Split) {
-	// selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
-	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
+	selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	// selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
 	openButton := widget.NewButton("Открыть", func() {
-		filePath := selectedDir + "\\" + selectedFile.fileName
-		text := getText(filePath)
-		data := fileRead(filePath)
+		text := getText(filepath.Join(selectedDir, selectedFile.fileName))
+		data := fileRead(filepath.Join(selectedDir, selectedFile.fileName))
 		textEditor(data, text)
 	})
 	createButton := widget.NewButton("Создать", nil)
@@ -181,9 +181,8 @@ func mainForm() (box *container.Split) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		filePath := selectedDir + "\\" + files[id].Name()
+		filePath := filepath.Join(selectedDir, files[id].Name())
 		selectedFile = fileRead(filePath)
-		selectedFile.fileName = files[id].Name() // todo
 
 		tags := ""
 		for _, tag := range selectedFile.tag {

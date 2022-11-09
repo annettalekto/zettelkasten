@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -44,11 +45,7 @@ func fileRead(filePath string) (f fileType) {
 	}
 	text := strings.Split(string(bytes), "\n")
 
-	// for i, line := range text { //отладка
-	// 	fmt.Printf("%d: %s\n", i, string(line))
-	// }
-
-	f.fileName = filePath // todo
+	f.fileName = filepath.Base(filePath)
 
 	for _, line := range text {
 		if strings.Contains(line, "topic:") {
