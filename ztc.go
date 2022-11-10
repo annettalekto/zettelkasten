@@ -107,6 +107,7 @@ func abautProgramm() {
 }
 
 func mainForm() (box *container.Split) {
+	var list *widget.List
 	selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
 	// selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
@@ -127,16 +128,27 @@ func mainForm() (box *container.Split) {
 		fmt.Println(file.Name(), file.IsDir())
 	}
 	dirLabel := widget.NewLabel(selectedDir)
-	dirButton := widget.NewButton("Каталог", func() {
-		// как настроить на каталог?
-		// DEBUG если выбрано Закрыть, уходит в panic
-		openFile := func(r fyne.URIReadCloser, _ error) {
-			fmt.Println(r.URI())
-		}
-		w := fyne.CurrentApp().Driver().AllWindows()[0]
 
-		dialog := dialog.NewFileOpen(openFile, w)
+	dirButton := widget.NewButton("Каталог", func() {
+		dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
+			if r != nil && err == nil {
+				fmt.Println(r.URI())
+				selectedDir = filepath.Dir(r.URI().Path())
+				dirLabel.SetText(selectedDir)
+				list.Refresh()
+			}
+		},
+			fyne.CurrentApp().Driver().AllWindows()[0],
+		)
+
 		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+		var dir fyne.ListableURI
+		d := storage.NewFileURI(selectedDir)
+		dir, _ = storage.ListerForURI(d)
+
+		dialog.SetLocation(dir)
+		dialog.SetConfirmText("Выбрать") // вместо ok
+		dialog.SetDismissText("Закрыть") // вместо Cancel
 		dialog.Show()
 	})
 	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
@@ -163,7 +175,7 @@ func mainForm() (box *container.Split) {
 		container.NewBorder(nil, nil, label("Дата: "), dateSearchButton, dateEntry),
 	)
 
-	list := widget.NewList(
+	list = widget.NewList(
 		func() int {
 			return len(files)
 		},

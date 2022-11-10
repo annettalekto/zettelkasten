@@ -21,8 +21,8 @@ type fileType struct {
 	date        time.Time
 }
 
-var selectedDir string
-var selectedFile fileType
+var selectedDir string    // сделать локальной только для папки и лабела
+var selectedFile fileType // +полный путь
 
 /*
 todo
