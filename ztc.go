@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -108,12 +107,12 @@ func abautProgramm() {
 
 func mainForm() (box *container.Split) {
 	var list *widget.List
-	selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
-	// selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
+	// selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
+	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
 	openButton := widget.NewButton("Открыть", func() {
-		text := getText(filepath.Join(selectedDir, selectedFile.fileName))
-		data := fileRead(filepath.Join(selectedDir, selectedFile.fileName))
+		text := getText(selectedFile.filePath)
+		data := fileRead(selectedFile.filePath)
 		textEditor(data, text)
 	})
 	createButton := widget.NewButton("Создать", nil)
@@ -122,7 +121,6 @@ func mainForm() (box *container.Split) {
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
 		fmt.Printf("Ошибка: рабочая папка не открыта\n")
-		log.Fatal(err)
 	}
 	for _, file := range files {
 		fmt.Println(file.Name(), file.IsDir())
@@ -135,6 +133,7 @@ func mainForm() (box *container.Split) {
 				fmt.Println(r.URI())
 				selectedDir = filepath.Dir(r.URI().Path())
 				dirLabel.SetText(selectedDir)
+				files, _ = os.ReadDir(selectedDir)
 				list.Refresh()
 			}
 		},

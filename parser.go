@@ -13,7 +13,7 @@ import (
 )
 
 type fileType struct {
-	fileName    string
+	filePath    string
 	topic       string // всегда одна?
 	tag         []string
 	link        string
@@ -21,8 +21,7 @@ type fileType struct {
 	date        time.Time
 }
 
-var selectedDir string    // сделать локальной только для папки и лабела
-var selectedFile fileType // +полный путь
+var selectedFile fileType
 
 /*
 todo
@@ -45,7 +44,7 @@ func fileRead(filePath string) (f fileType) {
 	}
 	text := strings.Split(string(bytes), "\n")
 
-	f.fileName = filepath.Base(filePath)
+	f.filePath = filePath
 
 	for _, line := range text {
 		if strings.Contains(line, "topic:") {
@@ -133,27 +132,32 @@ func textEditor(data fileType, text string) { // текст должен сох�
 	w.CenterOnScreen()
 	w.Resize(fyne.NewSize(800, 600))
 
+	var tagSlise []string
+	for _, s := range data.tag {
+		tagSlise = append(tagSlise, "#"+s)
+	}
 	fileNameEntry := widget.NewEntry()
 	fileNameEntry.TextStyle.Monospace = true
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	tagEntry := widget.NewEntry()
-	tagEntry.TextStyle.Monospace = true
+	tagSelectEntry := widget.NewSelectEntry(tagSlise)
+	tagSelectEntry.TextStyle.Monospace = true
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
 
 	searchBox := container.NewVBox(
 		container.NewBorder(nil, nil, label("Имя:  "), nil, fileNameEntry),
 		container.NewBorder(nil, nil, label("Тема: "), nil, topicEntry),
-		container.NewBorder(nil, nil, label("Теги: "), nil, tagEntry),
+		container.NewBorder(nil, nil, label("Теги: "), nil, tagSelectEntry),
 		container.NewBorder(nil, nil, label("Дата: "), nil, dateEntry),
 	)
 
-	fileNameEntry.SetText(data.fileName) // только имя todo
+	fileNameEntry.SetText(filepath.Base(data.filePath))
 	topicEntry.SetText(data.topic)
-	tagEntry.SetText(data.tag[0]) // todo все, с #, с пробелом?
 	dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
-
+	tagSelectEntry.OnChanged = func(s string) {
+		fmt.Println(s)
+	}
 	textEntry := widget.NewMultiLineEntry()
 	textEntry.TextStyle.Monospace = true
 	textEntry.Wrapping = fyne.TextWrapBreak
