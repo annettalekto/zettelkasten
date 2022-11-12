@@ -113,10 +113,15 @@ func mainForm() (box *container.Split) {
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
-		textEditor(data, text)
+		if data.filePath != "" { // todo не открывать если не выбран файл
+			textEditor(data, text)
+		}
 	})
-	createButton := widget.NewButton("Создать", nil)
-	bottomBox := container.NewHBox(layout.NewSpacer(), openButton, createButton)
+	createButton := widget.NewButton("Создать", func() {
+		var data fileType
+		textEditor(data, "")
+	})
+	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
@@ -213,37 +218,3 @@ func mainForm() (box *container.Split) {
 
 	return
 }
-
-//--------------------------------------
-/*
-func face() *fyne.Container {
-	serchEntry := widget.NewEntry()
-	btnOpen := widget.NewButton("Открыть", nil)
-	btnSave := widget.NewButton("Сохранить", nil)
-
-	btnBox := container.NewHBox(btnOpen, btnSave)
-	box := container.NewVBox(serchEntry, btnBox)
-	return box
-}
-
-func form() *fyne.Container {
-	titleEntry := widget.NewEntry()
-	titleEntry.PlaceHolder = "Заголовок"
-	// titleEntry.OnChanged
-	hash := widget.NewEntry()
-	hash.PlaceHolder = "#хеш"
-	boxTop := container.NewVBox(titleEntry, hash)
-
-	textEntry := widget.NewEntry()
-	boxEntry := container.NewMax(textEntry)
-
-	link := widget.NewEntry()
-	link.PlaceHolder = "Ссылка"
-
-	btnSave := widget.NewButton("Сохранить", nil)
-	boxBottom := container.NewVBox(link, btnSave)
-
-	box := container.NewHBox(boxTop, boxEntry, boxBottom)
-	return box
-}
-*/

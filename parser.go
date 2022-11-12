@@ -125,8 +125,7 @@ func label(labelName string) *widget.Label {
 	return l
 }
 
-func textEditor(data fileType, text string) { // текст должен сохранять форматирование
-	// в разных окнах расположить остальные элементы
+func textEditor(data fileType, text string) {
 
 	w := fyne.CurrentApp().NewWindow("Типо текстовый редактор")
 	w.CenterOnScreen()
@@ -142,6 +141,9 @@ func textEditor(data fileType, text string) { // текст должен сох�
 	topicEntry.TextStyle.Monospace = true
 	tagSelectEntry := widget.NewSelectEntry(tagSlise)
 	tagSelectEntry.TextStyle.Monospace = true
+	if len(tagSlise) > 0 {
+		tagSelectEntry.SetText(tagSlise[0])
+	}
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
 
@@ -164,6 +166,9 @@ func textEditor(data fileType, text string) { // текст должен сох�
 	textEntry.SetText(text)
 
 	saveButton := widget.NewButton("Сохранить", func() {
+		// считать в data и text
+		// сохранить в папку
+		// добавить в список файлов слева
 	})
 
 	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, saveButton), nil, nil, textEntry)
