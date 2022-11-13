@@ -110,6 +110,8 @@ func mainForm() (box *container.Split) {
 	// selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
 	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
+	//todo добавить кнопку открывающую список тем и тегов. В какой формат переделать?
+
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
@@ -160,24 +162,29 @@ func mainForm() (box *container.Split) {
 
 	fileNameEntry := widget.NewEntry()
 	fileNameEntry.TextStyle.Monospace = true
-	fileNameSearchButton := widget.NewButton("Поиск", nil)
+	// fileNameSearchButton := widget.NewButton("Поиск", nil)
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	topicSearchButton := widget.NewButton("Поиск", nil)
+	// topicSearchButton := widget.NewButton("Поиск", nil)
 	tagEntry := widget.NewEntry()
 	tagEntry.TextStyle.Monospace = true
-	tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
+	// tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
-	dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
+	// dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
+	searchButton := widget.NewButton("Поиск", nil)
+	clearButton := widget.NewButton("Очистить", nil)
 
 	searchBox := container.NewVBox(
 		label(""),
-		container.NewBorder(nil, nil, label("Имя:  "), fileNameSearchButton, fileNameEntry),
-		container.NewBorder(nil, nil, label("Тема: "), topicSearchButton, topicEntry),
-		container.NewBorder(nil, nil, label("Теги: "), tagSearchButton, tagEntry),
-		container.NewBorder(nil, nil, label("Дата: "), dateSearchButton, dateEntry),
+		container.NewBorder(nil, nil, label("Имя:  "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, label("Тема: "), nil, topicEntry),
+		container.NewBorder(nil, nil, label("Теги: "), nil, tagEntry),
+		container.NewBorder(nil, nil, label("Дата: "), nil, dateEntry),
+		container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton)),
 	)
+	// searchBox2 := container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton))
+	// searchBox := container.NewVBox(searchBox1, searchBox2)
 
 	list = widget.NewList(
 		func() int {

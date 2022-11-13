@@ -139,7 +139,7 @@ func textEditor(data fileType, text string) {
 	fileNameEntry.TextStyle.Monospace = true
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	tagSelectEntry := widget.NewSelectEntry(tagSlise)
+	tagSelectEntry := widget.NewSelectEntry(tagSlise) // todo multy select попробовать добавить галочку
 	tagSelectEntry.TextStyle.Monospace = true
 	if len(tagSlise) > 0 {
 		tagSelectEntry.SetText(tagSlise[0])
@@ -156,7 +156,7 @@ func textEditor(data fileType, text string) {
 
 	fileNameEntry.SetText(filepath.Base(data.filePath))
 	topicEntry.SetText(data.topic)
-	dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
+	dateEntry.SetText(data.date.Format("02.01.2006 15:04")) // type DatePicker todo
 	tagSelectEntry.OnChanged = func(s string) {
 		fmt.Println(s)
 	}
@@ -167,8 +167,9 @@ func textEditor(data fileType, text string) {
 
 	saveButton := widget.NewButton("Сохранить", func() {
 		// считать в data и text
-		// сохранить в папку
-		// добавить в список файлов слева
+		// сохранить в папку файл
+		// теги сохранить в общий файл
+		// data добавить в слайс, обновить список файлов слева
 	})
 
 	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, saveButton), nil, nil, textEntry)
