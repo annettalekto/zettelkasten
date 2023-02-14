@@ -9,6 +9,8 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -36,12 +38,17 @@ NewEntryWithData
 
 // var base []fileType
 
+/*
+fileRead - чтение файла filePath
+достаем из него всю информацию и складываем в структуру
+*/
 func fileRead(filePath string) (f fileType) {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
 		// todo add status line
 		return
 	}
+
 	text := strings.Split(string(bytes), "\n")
 
 	f.filePath = filePath
@@ -94,6 +101,10 @@ func fileRead(filePath string) (f fileType) {
 	return
 }
 
+/*
+getText - прочитать файл,
+вернуть только текст заметки
+*/
 func getText(filePath string) (fileText string) {
 
 	bytes, err := os.ReadFile(filePath)
@@ -119,12 +130,15 @@ func getText(filePath string) (fileText string) {
 	return
 }
 
-func label(labelName string) *widget.Label {
+func newlabel(labelName string) *widget.Label {
 	l := widget.NewLabel(labelName)
 	l.TextStyle.Monospace = true
 	return l
 }
 
+/*
+textEditor -
+*/
 func textEditor(data fileType, text string) {
 
 	w := fyne.CurrentApp().NewWindow("Типо текстовый редактор")
@@ -139,7 +153,7 @@ func textEditor(data fileType, text string) {
 	fileNameEntry.TextStyle.Monospace = true
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	tagSelectEntry := widget.NewSelectEntry(tagSlise) // todo multy select попробовать добавить галочку
+	tagSelectEntry := widget.NewSelectEntry(tagSlise)
 	tagSelectEntry.TextStyle.Monospace = true
 	if len(tagSlise) > 0 {
 		tagSelectEntry.SetText(tagSlise[0])
@@ -148,10 +162,10 @@ func textEditor(data fileType, text string) {
 	dateEntry.TextStyle.Monospace = true
 
 	searchBox := container.NewVBox(
-		container.NewBorder(nil, nil, label("Имя:  "), nil, fileNameEntry),
-		container.NewBorder(nil, nil, label("Тема: "), nil, topicEntry),
-		container.NewBorder(nil, nil, label("Теги: "), nil, tagSelectEntry),
-		container.NewBorder(nil, nil, label("Дата: "), nil, dateEntry),
+		container.NewBorder(nil, nil, newlabel("Имя:  "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
+		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagSelectEntry),
+		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
 	)
 
 	fileNameEntry.SetText(filepath.Base(data.filePath))
@@ -165,14 +179,26 @@ func textEditor(data fileType, text string) {
 	textEntry.Wrapping = fyne.TextWrapBreak
 	textEntry.SetText(text)
 
-	saveButton := widget.NewButton("Сохранить", func() {
+	saveButton := widget.NewButton("Сохранить", func() { // добавить закрыть без сохранения
 		// считать в data и text
 		// сохранить в папку файл
 		// теги сохранить в общий файл
 		// data добавить в слайс, обновить список файлов слева
 	})
 
-	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, saveButton), nil, nil, textEntry)
+	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
+		d := dialog.NewConfirm("Вопрос", "Точно не сохранять?", func(b bool) {
+			if b {
+				w.Close()
+			}
+		}, w)
+		d.SetDismissText("Hет")
+		d.SetConfirmText("Да")
+		d.Show()
+	})
+	btn := container.NewHBox(notSaveButton, layout.NewSpacer(), saveButton)
+
+	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, btn), nil, nil, textEntry)
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
 }

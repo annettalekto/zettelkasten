@@ -29,6 +29,14 @@ func main() {
 	w.CenterOnScreen()
 	w.SetMaster()
 
+	// регистрируем падение скрипта
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("!!!		У скрипта паника %c%c%c		!!!", 128561, 128561, 128561)
+			os.Exit(1)
+		}
+	}()
+
 	menu := fyne.NewMainMenu(
 		fyne.NewMenu("Файл",
 			// a quit item will be appended to our first menu
@@ -57,6 +65,11 @@ func main() {
 	// будет сохранять файлы в определенном виде, ну и читать их
 	// Открыть: выбранный из списка файл в редакторе с возможностью сохранения
 	// Создать: ввод текста и доп. данных, сохранение в формате, запись в список тегов и тд
+
+	//Поиск попробоавать организовать так:
+	// строка ввод, кнопка поиск, возможность выбрать по тегу/имени и тд делать поиск
+	// добавить кнопку очиски
+	// возможность поиска из тех что уже найдены или вернуться к поиску по всему каталогу
 
 	w.SetContent(mainForm())
 	w.ShowAndRun()
@@ -107,10 +120,10 @@ func abautProgramm() {
 
 func mainForm() (box *container.Split) {
 	var list *widget.List
-	// selectedDir := "C:\\Users\\nesterovaaa\\Dropbox\\Zettelkasten"
 	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
-	//todo добавить кнопку открывающую список тем и тегов. В какой формат переделать?
+	// todo добавить кнопку открывающую список тем и тегов.
+	// добавить строку состояния
 
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
@@ -123,7 +136,9 @@ func mainForm() (box *container.Split) {
 		var data fileType
 		textEditor(data, "")
 	})
-	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
+	bottomBtn := container.NewHBox(layout.NewSpacer(), createButton, openButton)
+	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
+	bottomBox := container.NewVBox(bottomBtn, statusLabel)
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
@@ -176,11 +191,11 @@ func mainForm() (box *container.Split) {
 	clearButton := widget.NewButton("Очистить", nil)
 
 	searchBox := container.NewVBox(
-		label(""),
-		container.NewBorder(nil, nil, label("Имя:  "), nil, fileNameEntry),
-		container.NewBorder(nil, nil, label("Тема: "), nil, topicEntry),
-		container.NewBorder(nil, nil, label("Теги: "), nil, tagEntry),
-		container.NewBorder(nil, nil, label("Дата: "), nil, dateEntry),
+		newlabel(""),
+		container.NewBorder(nil, nil, newlabel("Имя:  "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
+		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagEntry),
+		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
 		container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton)),
 	)
 	// searchBox2 := container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton))

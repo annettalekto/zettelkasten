@@ -1,5 +1,6 @@
 *.exe
 *.txt
+*.png
 
 #*.toml
 upp.toml
