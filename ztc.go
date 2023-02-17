@@ -118,8 +118,9 @@ func abautProgramm() {
 	w.Show() // ShowAndRun -- panic!
 }
 
-func mainForm() (box *container.Split) {
+func mainForm() (box *fyne.Container) {
 	var list *widget.List
+	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
 	// todo добавить кнопку открывающую список тем и тегов.
@@ -136,9 +137,7 @@ func mainForm() (box *container.Split) {
 		var data fileType
 		textEditor(data, "")
 	})
-	bottomBtn := container.NewHBox(layout.NewSpacer(), createButton, openButton)
-	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
-	bottomBox := container.NewVBox(bottomBtn, statusLabel)
+	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
@@ -236,7 +235,9 @@ func mainForm() (box *container.Split) {
 	// panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, container.NewVBox(searchBox))
 	panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, searchBox)
 
-	box = container.NewHSplit(list, panelBox)
+	split := container.NewHSplit(list, panelBox)
+
+	box = container.NewBorder(nil, statusLabel, nil, nil, split)
 
 	return
 }
