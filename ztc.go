@@ -71,6 +71,10 @@ func main() {
 	// добавить кнопку очиски
 	// возможность поиска из тех что уже найдены или вернуться к поиску по всему каталогу
 
+	// теги - есть файл со списком тегов, желательно в каком то виде вывести этот файл, чтобы
+	// можно было создавать  новые теги (то же темы и др). а так же можно сравнивать с этим список
+	// когда создается файл и указываются теги.
+
 	w.SetContent(mainForm())
 	w.ShowAndRun()
 }
@@ -123,13 +127,10 @@ func mainForm() (box *fyne.Container) {
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
-	// todo добавить кнопку открывающую список тем и тегов.
-	// добавить строку состояния
-
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
-		if data.filePath != "" { // todo не открывать если не выбран файл
+		if data.filePath != "" {
 			textEditor(data, text)
 		}
 	})
@@ -141,7 +142,8 @@ func mainForm() (box *fyne.Container) {
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
-		fmt.Printf("Ошибка: рабочая папка не открыта\n")
+		fmt.Printf("Ошибка: рабочая папка не открыта\n") // todo как обрабатывать ошибки
+		statusLabel.Text = "Ошибка: рабочая папка не открыта"
 	}
 	for _, file := range files {
 		fmt.Println(file.Name(), file.IsDir())

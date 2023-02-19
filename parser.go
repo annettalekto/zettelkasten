@@ -137,7 +137,9 @@ func newlabel(labelName string) *widget.Label {
 }
 
 /*
-textEditor -
+textEditor - открыть окно с текстом выбранного файла
+Сохранить изменения
+Закрыть без сохранения
 */
 func textEditor(data fileType, text string) {
 
@@ -180,10 +182,10 @@ func textEditor(data fileType, text string) {
 	textEntry.SetText(text)
 
 	saveButton := widget.NewButton("Сохранить", func() { // добавить закрыть без сохранения
-		// считать в data и text
+		// считать с формы в структуры data и text
 		// сохранить в папку файл
-		// теги сохранить в общий файл
-		// data добавить в слайс, обновить список файлов слева
+		// теги сохранить в общий файл?
+		// data добавить в слайс, обновить список файлов слева?
 	})
 
 	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
@@ -201,4 +203,8 @@ func textEditor(data fileType, text string) {
 	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, btn), nil, nil, textEntry)
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
+}
+
+func saveFile() {
+
 }
