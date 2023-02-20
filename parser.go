@@ -26,7 +26,7 @@ type fileType struct {
 var selectedFile fileType
 
 /*
-todo
+NOTE:
 +конвертировать все файлы - избавиться от BOM \ufeff
 +день недели убрать из даты
 +link
@@ -45,7 +45,7 @@ fileRead - чтение файла filePath
 func fileRead(filePath string) (f fileType) {
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
-		// todo add status line
+		// FIXME: add status line
 		return
 	}
 
@@ -58,7 +58,7 @@ func fileRead(filePath string) (f fileType) {
 			f.topic = strings.TrimPrefix(line, "topic: ")
 		}
 
-		if strings.Contains(line, "#") {
+		if strings.Contains(line, "#") { // fixme: # может быть использована для форматирования. переделать на метку tag
 			slice := strings.Split(line, "#")
 			for _, s := range slice {
 				if s != "" && s != "\r" {
@@ -73,7 +73,7 @@ func fileRead(filePath string) (f fileType) {
 			f.link = strings.TrimPrefix(s, "link: ")
 		}
 
-		if strings.Contains(line, "[") { // todo парс строк
+		if strings.Contains(line, "[") { // TODO: парс строк
 			slice := strings.Split(line, "[")
 			for _, s := range slice {
 				s = strings.TrimSuffix(s, "\r")
@@ -142,38 +142,38 @@ textEditor - открыть окно с текстом выбранного фа
 Закрыть без сохранения
 */
 func textEditor(data fileType, text string) {
+	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 
 	w := fyne.CurrentApp().NewWindow("Типо текстовый редактор")
 	w.CenterOnScreen()
 	w.Resize(fyne.NewSize(800, 600))
 
-	var tagSlise []string
-	for _, s := range data.tag {
-		tagSlise = append(tagSlise, "#"+s)
+	tags := ""
+	for _, tag := range selectedFile.tag {
+		tags += "#" + tag + " "
 	}
+
 	fileNameEntry := widget.NewEntry()
 	fileNameEntry.TextStyle.Monospace = true
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	tagSelectEntry := widget.NewSelectEntry(tagSlise)
-	tagSelectEntry.TextStyle.Monospace = true
-	if len(tagSlise) > 0 {
-		tagSelectEntry.SetText(tagSlise[0])
-	}
+	tagEntry := widget.NewEntry()
+	tagEntry.TextStyle.Monospace = true
+	tagEntry.SetText(tags)
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
 
-	searchBox := container.NewVBox(
+	searchBox := container.NewVBox( // TODO: переименовать
 		container.NewBorder(nil, nil, newlabel("Имя:  "), nil, fileNameEntry),
 		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
-		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagSelectEntry),
+		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagEntry), //  fixme: tagEntry
 		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
 	)
 
 	fileNameEntry.SetText(filepath.Base(data.filePath))
 	topicEntry.SetText(data.topic)
-	dateEntry.SetText(data.date.Format("02.01.2006 15:04")) // type DatePicker todo
-	tagSelectEntry.OnChanged = func(s string) {
+	dateEntry.SetText(data.date.Format("02.01.2006 15:04")) // TODO:  dateEntry ->type DatePicker
+	tagEntry.OnChanged = func(s string) {
 		fmt.Println(s)
 	}
 	textEntry := widget.NewMultiLineEntry()
@@ -181,9 +181,20 @@ func textEditor(data fileType, text string) {
 	textEntry.Wrapping = fyne.TextWrapBreak
 	textEntry.SetText(text)
 
-	saveButton := widget.NewButton("Сохранить", func() { // добавить закрыть без сохранения
-		// считать с формы в структуры data и text
-		// сохранить в папку файл
+	saveButton := widget.NewButton("Сохранить", func() {
+		var d fileType
+		d.filePath = fileNameEntry.Text
+		d.topic = topicEntry.Text
+		// tags
+		sl := strings.Split(tagEntry.Text, "#") // debug: проверить тут
+		for _, s := range sl {
+			if s != "" && s != "\r" {
+				s = strings.TrimSuffix(s, " ")
+				d.tag = append(d.tag, s)
+			}
+		}
+		// d.date =  dateEntry ->type DatePicker сначала переделать элемент
+		// сохранить в папку файл в соответствии с паттерном
 		// теги сохранить в общий файл?
 		// data добавить в слайс, обновить список файлов слева?
 	})
@@ -200,11 +211,11 @@ func textEditor(data fileType, text string) {
 	})
 	btn := container.NewHBox(notSaveButton, layout.NewSpacer(), saveButton)
 
-	box := container.NewBorder(searchBox, container.NewBorder(nil, nil, nil, btn), nil, nil, textEntry)
+	box := container.NewBorder(searchBox, container.NewBorder(nil, statusLabel, nil, btn), nil, nil, textEntry)
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
 }
 
-func saveFile() {
+func saveFile(data fileType, dir, text string) {
 
 }
