@@ -189,6 +189,7 @@ func mainForm() (box *fyne.Container) {
 	// tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
+
 	// dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
 	searchButton := widget.NewButton("Поиск", nil)
 	clearButton := widget.NewButton("Очистить", nil)

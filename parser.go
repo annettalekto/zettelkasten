@@ -172,7 +172,7 @@ func textEditor(data fileType, text string) {
 
 	fileNameEntry.SetText(filepath.Base(data.filePath))
 	topicEntry.SetText(data.topic)
-	dateEntry.SetText(data.date.Format("02.01.2006 15:04")) // TODO:  dateEntry ->type DatePicker
+	dateEntry.SetText(data.date.Format("02.01.2006 15:04"))
 	tagEntry.OnChanged = func(s string) {
 		fmt.Println(s)
 	}
@@ -193,7 +193,7 @@ func textEditor(data fileType, text string) {
 				d.tag = append(d.tag, s)
 			}
 		}
-		// d.date =  dateEntry ->type DatePicker сначала переделать элемент
+		// d.date =  todo: элемента такого  нет
 		// сохранить в папку файл в соответствии с паттерном
 		// теги сохранить в общий файл?
 		// data добавить в слайс, обновить список файлов слева?
