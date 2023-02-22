@@ -66,6 +66,7 @@ func main() {
 	// будет сохранять файлы в определенном виде, ну и читать их
 	// Открыть: выбранный из списка файл в редакторе с возможностью сохранения
 	// Создать: ввод текста и доп. данных, сохранение в формате, запись в список тегов и тд
+	// todo: отладить сохранение изменения тестового файла, потом создавать новый
 
 	//Поиск попробоавать организовать так:
 	// строка ввод, кнопка поиск, возможность выбрать по тегу/имени и тд делать поиск
@@ -138,6 +139,7 @@ func mainForm() (box *fyne.Container) {
 	})
 	createButton := widget.NewButton("Создать", func() {
 		var data fileType
+		data.date = time.Now()
 		textEditor(data, "")
 	})
 	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
@@ -228,7 +230,7 @@ func mainForm() (box *fyne.Container) {
 
 		tags := ""
 		for _, tag := range selectedFile.tag {
-			tags += "#" + tag + " "
+			tags += tag + " "
 		}
 		tagEntry.SetText(tags)
 		fileNameEntry.SetText(files[id].Name())
