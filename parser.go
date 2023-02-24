@@ -256,14 +256,14 @@ func textEditor(data fileType, text string) {
 			}
 		}
 
-		sl := strings.Split(tagEntry.Text, "#") // debug: проверить тут
+		sl := strings.Split(tagEntry.Text, "#")
 		for _, s := range sl {
 			if s != "" && s != "\r" {
 				s = strings.TrimSuffix(s, " ")
 				d.tag = append(d.tag, s)
 			}
 		}
-		sl = strings.Split(bindingMEntry.Text, "\n") // debug: проверить тут
+		sl = strings.Split(bindingMEntry.Text, "\n")
 		for _, s := range sl {
 			if s != "" && s != "\r" {
 				s = strings.TrimSuffix(s, " ")
@@ -273,9 +273,8 @@ func textEditor(data fileType, text string) {
 		d.filePath = fileNameEntry.Text
 		d.topic = topicEntry.Text
 		d.date, _ = time.Parse("02.01.2006 15:04:05", dateEntry.Text)
-		// сохранить в папку файл в соответствии с паттерном
-		// теги сохранить в общий файл?
-		// data добавить в слайс, обновить список файлов слева?
+
+		saveFile(d, textEntry.Text)
 	})
 
 	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
@@ -298,6 +297,55 @@ func textEditor(data fileType, text string) {
 	w.Show() // ShowAndRun -- panic!
 }
 
-func saveFile(data fileType, text string) {
+/*
+topic: Тема
 
+tag: #tag1 #tag2
+
+____________________________________________________________
+
+Текст идеи своими словами.
+
+____________________________________________________________
+
+link: www.lingvolive.com
+
+____________________________________________________________
+
+bind:
+2020 08 01 1019 Изучение языков.txt
+____________________________________________________________
+
+data: 2023.02.22 16:44
+
+
+*/
+
+func saveFile(data fileType, text string) error {
+	sep := "____________________________________________________________\n\n"
+	textall := "topic: " + data.topic + "\n\n"
+	textall += "tag: "
+	for _, tag := range data.tag {
+		textall += tag
+	}
+	textall += "\n\n" + sep
+	textall += text + "\n\n"
+	textall += sep
+
+	textall += "link: "
+	for _, link := range data.link {
+		textall += link
+	}
+	textall += "\n\n" + sep
+
+	textall += "bind: "
+	for _, bind := range data.bindingFile {
+		textall += bind
+	}
+	textall += "\n\n" + sep
+
+	textall += data.date.Format("02.01.2006 15:04:05")
+
+	err := os.WriteFile(data.filePath, []byte(textall), 0666)
+	return err
 }
