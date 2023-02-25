@@ -15,12 +15,12 @@ import (
 )
 
 type fileType struct {
-	filePath    string
-	topic       string
-	tag         []string
-	link        []string
-	bindingFile []string
-	date        time.Time
+	filePath     string
+	topic        string
+	tags         []string
+	links        []string
+	bindingFiles []string
+	date         time.Time
 }
 
 var selectedFile fileType
@@ -42,7 +42,7 @@ NewEntryWithData
 fileRead - чтение файла filePath
 достаем из него всю информацию и складываем в структуру
 */
-func fileRead(filePath string) (f fileType) {
+func fileRead(filePath string) (f fileType) { //todo: переименовать
 	bytes, err := os.ReadFile(filePath)
 	if err != nil { // todo: err
 		return
@@ -54,30 +54,32 @@ func fileRead(filePath string) (f fileType) {
 	// читаем однострочные
 	for _, line := range text {
 		if strings.Contains(line, "topic:") {
-			f.topic = strings.TrimPrefix(line, "topic: ")
+			line = strings.TrimPrefix(line, "topic:")
+			f.topic = strings.TrimPrefix(line, " ")
 		}
 
 		if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
-			line = strings.TrimPrefix(line, "tag: ")
+			line = strings.TrimPrefix(line, "tag:")
+			line = strings.TrimPrefix(line, " ")
 			slice := strings.Split(line, " ")
 			for _, s := range slice {
 				if s != "" && s != "\r" {
 					s = strings.TrimSuffix(s, " ")
 					s = strings.TrimSuffix(s, "\r")
-					f.tag = append(f.tag, s)
+					f.tags = append(f.tags, s)
 				}
 			}
 		}
 
-		if strings.Contains(line, "data:") {
-			// если есть дол. символы Parse не работает
-			s := strings.TrimPrefix(line, "data: ")
-
+		if strings.Contains(line, "date:") {
+			// если есть доп. символы Parse не работает
+			s := strings.TrimPrefix(line, "date:")
+			s = strings.TrimPrefix(s, " ")
 			s = strings.TrimSuffix(s, "\r")
 			s = strings.TrimSpace(s)
-			d, err := time.Parse("2006.01.02 15:04", s)
+			d, _ := time.Parse("02.01.2006 15:04", s)
 			fmt.Println("v", d.Weekday())
-			fmt.Println(d, err)
+			fmt.Println("v", d.Year())
 			f.date = d
 		}
 	}
@@ -94,16 +96,17 @@ func fileRead(filePath string) (f fileType) {
 			}
 			lineNext := strings.TrimSuffix(line, "\r")
 			if len(lineNext) > minLen {
-				f.link = append(f.link, lineNext)
+				f.links = append(f.links, lineNext)
 			}
 		}
 
 		if strings.Contains(line, "link:") {
 			copy = true
-			line0 := strings.TrimPrefix(line, "link: ")
+			line0 := strings.TrimPrefix(line, "link:")
+			line0 = strings.TrimPrefix(line0, " ")
 			line0 = strings.TrimSuffix(line0, "\r")
 			if len(line0) > minLen {
-				f.link = append(f.link, line0)
+				f.links = append(f.links, line0)
 			}
 		}
 	}
@@ -116,16 +119,17 @@ func fileRead(filePath string) (f fileType) {
 			}
 			lineNext := strings.TrimSuffix(line, "\r")
 			if len(lineNext) > minLen {
-				f.bindingFile = append(f.bindingFile, lineNext)
+				f.bindingFiles = append(f.bindingFiles, lineNext)
 			}
 		}
 
 		if strings.Contains(line, "bind:") {
 			copy = true
-			line0 := strings.TrimPrefix(line, "bind: ")
+			line0 := strings.TrimPrefix(line, "bind:")
+			line0 = strings.TrimPrefix(line0, " ")
 			line0 = strings.TrimSuffix(line0, "\r")
 			if len(line0) > minLen {
-				f.bindingFile = append(f.bindingFile, line0)
+				f.bindingFiles = append(f.bindingFiles, line0)
 			}
 		}
 	}
@@ -181,7 +185,7 @@ func textEditor(data fileType, text string) {
 	w.Resize(fyne.NewSize(800, 600))
 
 	tags := ""
-	for _, tag := range selectedFile.tag {
+	for _, tag := range selectedFile.tags {
 		tags += tag + " "
 	}
 
@@ -199,7 +203,7 @@ func textEditor(data fileType, text string) {
 	linkMEntry := widget.NewMultiLineEntry()
 	linkMEntry.TextStyle.Monospace = true
 
-	searchBox := container.NewVBox( // TODO: переименовать
+	entryBox := container.NewVBox(
 		container.NewBorder(nil, nil, newlabel("Имя:     "), nil, fileNameEntry),
 		container.NewBorder(nil, nil, newlabel("Тема:    "), nil, topicEntry),
 		container.NewBorder(nil, nil, newlabel("Теги:    "), nil, tagEntry),
@@ -220,19 +224,20 @@ func textEditor(data fileType, text string) {
 	textEntry.SetText(text)
 
 	binds := ""
-	for _, b := range data.bindingFile {
+	for _, b := range data.bindingFiles {
 		binds += b + "\n\r"
 	}
 	bindingMEntry.SetText(binds)
 
 	links := ""
-	for _, b := range data.link {
+	for _, b := range data.links {
 		links += b + "\n\r"
 	}
 	linkMEntry.SetText(links)
 
 	saveButton := widget.NewButton("Сохранить", func() {
 		var d fileType
+
 		if fileNameEntry.Text == "" {
 			statusLabel.SetText("Введите имя файла") // todo: можно компактнее обрабатывать ощибки?
 			return
@@ -249,7 +254,7 @@ func textEditor(data fileType, text string) {
 			statusLabel.SetText("Заполните поле даты")
 			return
 		} else {
-			_, err := time.Parse("02.01.2006 15:04:05", dateEntry.Text)
+			_, err := time.Parse("02.01.2006 15:04", dateEntry.Text)
 			if err != nil {
 				statusLabel.SetText("Неверно заполнено поле даты")
 				return
@@ -260,21 +265,36 @@ func textEditor(data fileType, text string) {
 		for _, s := range sl {
 			if s != "" && s != "\r" {
 				s = strings.TrimSuffix(s, " ")
-				d.tag = append(d.tag, s)
+				d.tags = append(d.tags, "#"+s)
 			}
 		}
 		sl = strings.Split(bindingMEntry.Text, "\n")
 		for _, s := range sl {
 			if s != "" && s != "\r" {
 				s = strings.TrimSuffix(s, " ")
-				d.bindingFile = append(d.tag, s)
+				d.bindingFiles = append(d.bindingFiles, s)
 			}
 		}
-		d.filePath = fileNameEntry.Text
+		sl = strings.Split(linkMEntry.Text, "\n")
+		for _, s := range sl {
+			if s != "" && s != "\r" {
+				s = strings.TrimSuffix(s, " ")
+				d.links = append(d.links, s)
+			}
+		}
+		d.filePath = filepath.Dir(data.filePath) + "\\" + fileNameEntry.Text
 		d.topic = topicEntry.Text
-		d.date, _ = time.Parse("02.01.2006 15:04:05", dateEntry.Text)
+		d.date, _ = time.Parse("02.01.2006 15:04", dateEntry.Text)
 
-		saveFile(d, textEntry.Text)
+		tt := textEntry.Text
+		tt = strings.TrimSuffix(tt, "\n")
+
+		err := saveFile(d, tt)
+		if err == nil {
+			statusLabel.SetText("Файл сохранён")
+		} else {
+			statusLabel.SetText("Ошибка сохранения файла: " + err.Error())
+		}
 	})
 
 	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
@@ -292,60 +312,38 @@ func textEditor(data fileType, text string) {
 		statusLabel,
 	)
 
-	box := container.NewBorder(searchBox, container.NewBorder(nil, bottomBox, nil, btn), nil, nil, textEntry)
+	box := container.NewBorder(entryBox, container.NewBorder(nil, bottomBox, nil, btn), nil, nil, textEntry)
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
 }
 
-/*
-topic: Тема
-
-tag: #tag1 #tag2
-
-____________________________________________________________
-
-Текст идеи своими словами.
-
-____________________________________________________________
-
-link: www.lingvolive.com
-
-____________________________________________________________
-
-bind:
-2020 08 01 1019 Изучение языков.txt
-____________________________________________________________
-
-data: 2023.02.22 16:44
-
-
-*/
-
 func saveFile(data fileType, text string) error {
 	sep := "____________________________________________________________\n\n"
 	textall := "topic: " + data.topic + "\n\n"
-	textall += "tag: "
-	for _, tag := range data.tag {
-		textall += tag
+	textall += "tag:"
+	for _, tag := range data.tags {
+		textall += " " + tag
 	}
 	textall += "\n\n" + sep
 	textall += text + "\n\n"
 	textall += sep
 
-	textall += "link: "
-	for _, link := range data.link {
-		textall += link
+	textall += "link:"
+	for _, link := range data.links {
+		textall += " " + link
 	}
 	textall += "\n\n" + sep
 
 	textall += "bind: "
-	for _, bind := range data.bindingFile {
-		textall += bind
+	for _, bind := range data.bindingFiles {
+		textall += " " + bind
 	}
 	textall += "\n\n" + sep
 
-	textall += data.date.Format("02.01.2006 15:04:05")
+	textall += "date: "
+	textall += data.date.Format("02.01.2006 15:04") + "\n"
 
 	err := os.WriteFile(data.filePath, []byte(textall), 0666)
+
 	return err
 }

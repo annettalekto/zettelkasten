@@ -32,7 +32,7 @@ func main() {
 	// регистрируем падение скрипта
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Printf("!!!		У скрипта паника %c%c%c		!!!", 128561, 128561, 128561)
+			fmt.Printf("!!!		Пааааника %c%c%c		!!!", 128561, 128561, 128561)
 			os.Exit(1)
 		}
 	}()
@@ -58,7 +58,7 @@ func main() {
 			if item.Label == "Quit" {
 				item.Label = "Выход"
 			}
-		} //
+		}
 	}()
 
 	// NOTE:
@@ -71,6 +71,8 @@ func main() {
 	// строка ввод, кнопка поиск, возможность выбрать по тегу/имени и тд делать поиск
 	// добавить кнопку очиски
 	// возможность поиска из тех что уже найдены или вернуться к поиску по всему каталогу
+
+	// сортировака по имени и дате (теме?)
 
 	// теги - есть файл со списком тегов, желательно в каком то виде вывести этот файл, чтобы
 	// можно было создавать  новые теги (то же темы и др). а так же можно сравнивать с этим список
@@ -107,7 +109,7 @@ func abautProgramm() {
 	w.CenterOnScreen()
 
 	img := canvas.NewImageFromURI(storage.NewFileURI("ind.png"))
-	img.Resize(fyne.NewSize(66, 90)) //без изменений
+	img.Resize(fyne.NewSize(66, 90))
 	img.Move(fyne.NewPos(10, 10))
 
 	l0 := widget.NewLabel(gProgramName)
@@ -132,7 +134,7 @@ func mainForm() (box *fyne.Container) {
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
-		if data.filePath != "" {
+		if data.filePath != "" { //todo ???
 			textEditor(data, text)
 		}
 	})
@@ -195,7 +197,7 @@ func mainForm() (box *fyne.Container) {
 	searchButton := widget.NewButton("Поиск", nil)
 	clearButton := widget.NewButton("Очистить", nil)
 
-	searchBox := container.NewVBox(
+	entryBox := container.NewVBox(
 		newlabel(""),
 		container.NewBorder(nil, nil, newlabel("Имя:  "), nil, fileNameEntry),
 		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
@@ -228,7 +230,7 @@ func mainForm() (box *fyne.Container) {
 		selectedFile = fileRead(filePath)
 
 		tags := ""
-		for _, tag := range selectedFile.tag {
+		for _, tag := range selectedFile.tags {
 			tags += tag + " "
 		}
 		tagEntry.SetText(tags)
@@ -239,7 +241,7 @@ func mainForm() (box *fyne.Container) {
 
 	// panelBox := container.NewBorder(container.NewVBox(dirBox, searchBox), bottomBox, nil, nil)
 	// panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, container.NewVBox(searchBox))
-	panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, searchBox)
+	panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, entryBox)
 
 	split := container.NewHSplit(list, panelBox)
 
