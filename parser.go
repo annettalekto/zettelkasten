@@ -26,19 +26,6 @@ type fileType struct {
 var selectedFile fileType
 
 /*
-NOTE:
-+конвертировать все файлы - избавиться от BOM \ufeff
-+день недели убрать из даты
-+link
-теги то с большой то с маленькой буквы
-
-перевести доп файлы на .csv
-NewEntryWithData
-*/
-
-// var base []fileType
-
-/*
 fileRead - чтение файла filePath
 достаем из него всю информацию и складываем в структуру
 */
@@ -54,18 +41,20 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 	// читаем однострочные
 	for _, line := range text {
 		if strings.Contains(line, "topic:") {
-			line = strings.TrimPrefix(line, "topic:")
-			f.topic = strings.TrimPrefix(line, " ")
+			//line = strings.TrimPrefix(line, "topic:")
+			// f.topic = strings.TrimPrefix(line, " ")
+			f.topic = mTrimPrefix(line, "topic:")
 		}
 
 		if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
-			line = strings.TrimPrefix(line, "tag:")
-			line = strings.TrimPrefix(line, " ")
+			// line = strings.TrimPrefix(line, "tag:")
+			// line = strings.TrimPrefix(line, " ")
+			line = mTrimPrefix(line, "tag:")
 			slice := strings.Split(line, " ")
 			for _, s := range slice {
-				if s != "" && s != "\r" {
-					s = strings.TrimSuffix(s, " ")
-					s = strings.TrimSuffix(s, "\r")
+				if s != "" {
+					// s = strings.TrimSuffix(s, " ")
+					// s = strings.TrimSuffix(s, "\r")
 					f.tags = append(f.tags, s)
 				}
 			}
@@ -73,13 +62,13 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 
 		if strings.Contains(line, "date:") {
 			// если есть доп. символы Parse не работает
-			s := strings.TrimPrefix(line, "date:")
-			s = strings.TrimPrefix(s, " ")
-			s = strings.TrimSuffix(s, "\r")
-			s = strings.TrimSpace(s)
+			s := mTrimPrefix(line, "date:")
+			// s = strings.TrimPrefix(s, " ")
+			// s = strings.TrimSuffix(s, "\r")
+			// s = strings.TrimSpace(s)
 			d, _ := time.Parse("02.01.2006 15:04", s)
-			fmt.Println("v", d.Weekday())
-			fmt.Println("v", d.Year())
+			// fmt.Println("v", d.Weekday())
+			// fmt.Println("v", d.Year())
 			f.date = d
 		}
 	}
@@ -94,7 +83,7 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 				copy = false
 				break
 			}
-			lineNext := strings.TrimSuffix(line, "\r")
+			lineNext := mTrimPrefix(line, " ")
 			if len(lineNext) > minLen {
 				f.links = append(f.links, lineNext)
 			}
@@ -102,9 +91,9 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 
 		if strings.Contains(line, "link:") {
 			copy = true
-			line0 := strings.TrimPrefix(line, "link:")
-			line0 = strings.TrimPrefix(line0, " ")
-			line0 = strings.TrimSuffix(line0, "\r")
+			line0 := mTrimPrefix(line, "link:")
+			// line0 = strings.TrimPrefix(line0, " ")
+			// line0 = strings.TrimSuffix(line0, "\r")
 			if len(line0) > minLen {
 				f.links = append(f.links, line0)
 			}
@@ -117,7 +106,7 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 				copy = false
 				break
 			}
-			lineNext := strings.TrimSuffix(line, "\r")
+			lineNext := mTrimPrefix(line, " ")
 			if len(lineNext) > minLen {
 				f.bindingFiles = append(f.bindingFiles, lineNext)
 			}
@@ -125,9 +114,9 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 
 		if strings.Contains(line, "bind:") {
 			copy = true
-			line0 := strings.TrimPrefix(line, "bind:")
-			line0 = strings.TrimPrefix(line0, " ")
-			line0 = strings.TrimSuffix(line0, "\r")
+			line0 := mTrimPrefix(line, "bind:")
+			// line0 = strings.TrimPrefix(line0, " ")
+			// line0 = strings.TrimSuffix(line0, "\r")
 			if len(line0) > minLen {
 				f.bindingFiles = append(f.bindingFiles, line0)
 			}
@@ -135,6 +124,16 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 	}
 
 	return
+}
+
+func mTrimPrefix(s, prefix string) string {
+
+	if strings.HasPrefix(s, prefix) {
+		s = strings.TrimPrefix(s, prefix)
+	}
+	s = strings.TrimSpace(s)
+	s = strings.TrimSuffix(s, "\r")
+	return s
 }
 
 /*
@@ -147,7 +146,7 @@ func getText(filePath string) (fileText string) {
 	if err != nil {
 		return
 	}
-	text := strings.Split(string(bytes), "\n")
+	text := strings.Split(string(bytes), "\r\n")
 
 	copy := false
 	for _, line := range text {
@@ -161,6 +160,13 @@ func getText(filePath string) (fileText string) {
 		if strings.Contains(line, "_____") {
 			copy = true
 		}
+	}
+
+	for strings.HasPrefix(fileText, "\r\n") {
+		fileText = strings.TrimPrefix(fileText, "\r\n")
+	}
+	for strings.HasSuffix(fileText, "\r\n") {
+		fileText = strings.TrimSuffix(fileText, "\r\n")
 	}
 
 	return
@@ -225,13 +231,13 @@ func textEditor(data fileType, text string) {
 
 	binds := ""
 	for _, b := range data.bindingFiles {
-		binds += b + "\n\r"
+		binds += b + "\r\n"
 	}
 	bindingMEntry.SetText(binds)
 
 	links := ""
 	for _, b := range data.links {
-		links += b + "\n\r"
+		links += b + "\r\n"
 	}
 	linkMEntry.SetText(links)
 
@@ -263,22 +269,22 @@ func textEditor(data fileType, text string) {
 
 		sl := strings.Split(tagEntry.Text, "#")
 		for _, s := range sl {
-			if s != "" && s != "\r" {
-				s = strings.TrimSuffix(s, " ")
+			if s != "" {
+				s = mTrimPrefix(s, " ")
 				d.tags = append(d.tags, "#"+s)
 			}
 		}
 		sl = strings.Split(bindingMEntry.Text, "\n")
 		for _, s := range sl {
-			if s != "" && s != "\r" {
-				s = strings.TrimSuffix(s, " ")
+			if s != "" {
+				s = mTrimPrefix(s, " ")
 				d.bindingFiles = append(d.bindingFiles, s)
 			}
 		}
 		sl = strings.Split(linkMEntry.Text, "\n")
 		for _, s := range sl {
-			if s != "" && s != "\r" {
-				s = strings.TrimSuffix(s, " ")
+			if s != "" {
+				s = mTrimPrefix(s, " ")
 				d.links = append(d.links, s)
 			}
 		}
@@ -287,7 +293,12 @@ func textEditor(data fileType, text string) {
 		d.date, _ = time.Parse("02.01.2006 15:04", dateEntry.Text)
 
 		tt := textEntry.Text
-		tt = strings.TrimSuffix(tt, "\n")
+		for strings.HasPrefix(tt, "\r\n") {
+			tt = strings.TrimPrefix(tt, "\r\n")
+		}
+		for strings.HasSuffix(tt, "\r\n") {
+			tt = strings.TrimSuffix(tt, "\r\n")
+		}
 
 		err := saveFile(d, tt)
 		if err == nil {
@@ -318,30 +329,30 @@ func textEditor(data fileType, text string) {
 }
 
 func saveFile(data fileType, text string) error {
-	sep := "____________________________________________________________\n\n"
-	textall := "topic: " + data.topic + "\n\n"
+	sep := "____________________________________________________________\r\n"
+	textall := "topic: " + data.topic + "\r\n"
 	textall += "tag:"
 	for _, tag := range data.tags {
 		textall += " " + tag
 	}
-	textall += "\n\n" + sep
-	textall += text + "\n\n"
+	textall += "\r\n" + sep
+	textall += text + "\r\n"
 	textall += sep
 
 	textall += "link:"
 	for _, link := range data.links {
-		textall += " " + link
+		textall += " " + link + "\r\n"
 	}
-	textall += "\n\n" + sep
+	textall += sep
 
 	textall += "bind: "
 	for _, bind := range data.bindingFiles {
-		textall += " " + bind
+		textall += " " + bind + "\r\n"
 	}
-	textall += "\n\n" + sep
+	textall += sep
 
 	textall += "date: "
-	textall += data.date.Format("02.01.2006 15:04") + "\n"
+	textall += data.date.Format("02.01.2006 15:04") + "\r\n"
 
 	err := os.WriteFile(data.filePath, []byte(textall), 0666)
 

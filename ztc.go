@@ -62,6 +62,16 @@ func main() {
 	}()
 
 	// NOTE:
+	/*
+			решить проблемку \r \n
+
+		+конвертировать все файлы - избавиться от BOM \ufeff
+			+день недели убрать из даты
+			+link
+			теги то с большой то с маленькой буквы
+
+			перевести доп файлы на .csv
+	*/
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
 	// Открыть: выбранный из списка файл в редакторе с возможностью сохранения
@@ -141,6 +151,7 @@ func mainForm() (box *fyne.Container) {
 	createButton := widget.NewButton("Создать", func() {
 		var data fileType
 		data.date = time.Now()
+		data.filePath = selectedFile.filePath
 		textEditor(data, "")
 	})
 	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
