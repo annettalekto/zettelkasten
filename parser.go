@@ -207,8 +207,10 @@ func textEditor(data fileType, text string) {
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
 	bindingMEntry := widget.NewMultiLineEntry()
+	bindingMEntry.Wrapping = fyne.TextWrapWord
 	bindingMEntry.TextStyle.Monospace = true
 	linkMEntry := widget.NewMultiLineEntry()
+	linkMEntry.Wrapping = fyne.TextWrapWord
 	linkMEntry.TextStyle.Monospace = true
 
 	entryBox := container.NewVBox(
@@ -228,7 +230,7 @@ func textEditor(data fileType, text string) {
 	}
 	textEntry := widget.NewMultiLineEntry()
 	textEntry.TextStyle.Monospace = true
-	textEntry.Wrapping = fyne.TextWrapBreak
+	textEntry.Wrapping = fyne.TextWrapWord // обязательно перенос по словам
 	textEntry.SetText(text)
 
 	binds := ""
