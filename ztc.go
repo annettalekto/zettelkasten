@@ -63,7 +63,10 @@ func main() {
 
 	// NOTE:
 	/*
-			решить проблемку \r \n
+			?решить проблемку \r \n (либо разбивку на строки делать както иначе, либо зачищать от символов, добавлять свой перевод строки в конце)
+			убрать txt из названия
+			добавить обновление списка файлов (по кнопке?) после создания файла хотя бы..
+			сохранить созданный файл в нужную папку
 
 		+конвертировать все файлы - избавиться от BOM \ufeff
 			+день недели убрать из даты
@@ -151,7 +154,7 @@ func mainForm() (box *fyne.Container) {
 	createButton := widget.NewButton("Создать", func() {
 		var data fileType
 		data.date = time.Now()
-		data.filePath = selectedFile.filePath
+		data.filePath = filepath.Join(selectedDir, "new")
 		textEditor(data, "")
 	})
 	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
@@ -161,9 +164,9 @@ func mainForm() (box *fyne.Container) {
 		fmt.Printf("Ошибка: рабочая папка не открыта\n") // TODO: как обрабатывать ошибки
 		statusLabel.Text = "Ошибка: рабочая папка не открыта"
 	}
-	for _, file := range files {
-		fmt.Println(file.Name(), file.IsDir())
-	}
+	// for _, file := range files {
+	// 	fmt.Println(file.Name(), file.IsDir())
+	// }
 	dirLabel := widget.NewLabel(selectedDir)
 
 	dirButton := widget.NewButton("Каталог", func() {

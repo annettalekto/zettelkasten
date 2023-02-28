@@ -15,7 +15,7 @@ import (
 )
 
 type fileType struct {
-	filePath     string
+	filePath     string // полное имя файла с путем и расширением файла
 	topic        string
 	tags         []string
 	links        []string
@@ -146,7 +146,7 @@ func getText(filePath string) (fileText string) {
 	if err != nil {
 		return
 	}
-	text := strings.Split(string(bytes), "\r\n")
+	text := strings.Split(string(bytes), "\n")
 
 	copy := false
 	for _, line := range text {
@@ -155,7 +155,9 @@ func getText(filePath string) (fileText string) {
 			if strings.Contains(line, "_____") {
 				break
 			}
-			fileText += line + "\r\n"
+			// line = strings.TrimSuffix(line, "\n")
+			// line = strings.TrimSuffix(line, "\r")
+			fileText += line + "\n"
 		}
 		if strings.Contains(line, "_____") {
 			copy = true
@@ -288,7 +290,7 @@ func textEditor(data fileType, text string) {
 				d.links = append(d.links, s)
 			}
 		}
-		d.filePath = filepath.Dir(data.filePath) + "\\" + fileNameEntry.Text
+		d.filePath = filepath.Join(filepath.Dir(data.filePath), fileNameEntry.Text)
 		d.topic = topicEntry.Text
 		d.date, _ = time.Parse("02.01.2006 15:04", dateEntry.Text)
 
@@ -328,8 +330,12 @@ func textEditor(data fileType, text string) {
 	w.Show() // ShowAndRun -- panic!
 }
 
+/*
+сохраняет данные из структуры в формате ztc
+*/
 func saveFile(data fileType, text string) error {
 	sep := "____________________________________________________________\r\n"
+
 	textall := "topic: " + data.topic + "\r\n"
 	textall += "tag:"
 	for _, tag := range data.tags {
@@ -339,13 +345,13 @@ func saveFile(data fileType, text string) error {
 	textall += text + "\r\n"
 	textall += sep
 
-	textall += "link:"
+	textall += "link:\r\n"
 	for _, link := range data.links {
 		textall += " " + link + "\r\n"
 	}
 	textall += sep
 
-	textall += "bind: "
+	textall += "bind:\r\n"
 	for _, bind := range data.bindingFiles {
 		textall += " " + bind + "\r\n"
 	}
