@@ -64,15 +64,14 @@ func main() {
 	// NOTE:
 	/*
 			?решить проблемку \r \n (либо разбивку на строки делать както иначе, либо зачищать от символов, добавлять свой перевод строки в конце)
-			убрать txt из названия
+			убрать txt из названия (добавить расширение как настройку (md, txt др)? - или лишнее усложнение)
 			добавить обновление списка файлов (по кнопке?) после создания файла хотя бы..
-			сохранить созданный файл в нужную папку
+			сохранить созданный файл в нужную -папку
 
 		+конвертировать все файлы - избавиться от BOM \ufeff
 			+день недели убрать из даты
 			+link
 			теги то с большой то с маленькой буквы
-
 			перевести доп файлы на .csv
 	*/
 	// прога для работы с сиситемой Zettelkasten
@@ -147,7 +146,7 @@ func mainForm() (box *fyne.Container) {
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
-		if data.filePath != "" { //todo ???
+		if data.filePath != "" { //todo: ???
 			textEditor(data, text)
 		}
 	})
@@ -182,6 +181,7 @@ func mainForm() (box *fyne.Container) {
 			fyne.CurrentApp().Driver().AllWindows()[0],
 		)
 
+		// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
 		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
 		var dir fyne.ListableURI
 		d := storage.NewFileURI(selectedDir)
@@ -193,23 +193,41 @@ func mainForm() (box *fyne.Container) {
 		dialog.Show()
 	})
 	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
-	// topBox := container.NewVBox(dirBox)
 
+	// поиск
+	const (
+		topic = "Тема" //переименовать
+		tag   = "Тег"
+	)
+	searchLabel := widget.NewLabel("подсказка как искать")
+	searchSelect := widget.NewSelect([]string{topic, tag}, func(value string) { // todo: дата
+		if value == topic {
+			searchLabel.SetText("Введите слова, которые должна содержать тема")
+		} else if value == tag {
+			searchLabel.SetText("Введите один тег без знака #")
+		}
+	})
+	searchSelect.SetSelected(topic)
+	searchEntry := widget.NewEntry()
+	searchEntry.TextStyle.Monospace = true
+	searchButton := widget.NewButton("Поиск", nil)
+	clearButton := widget.NewButton("Очистить", func() {
+		searchEntry.SetText("")
+	})
+	searchButtonBox := container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton))
+	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, nil, searchEntry), searchLabel, searchButtonBox)
+
+	topBottom := container.NewVBox(dirBox, searchBox)
+
+	// краткое отображение карточки
 	fileNameEntry := widget.NewEntry()
 	fileNameEntry.TextStyle.Monospace = true
-	// fileNameSearchButton := widget.NewButton("Поиск", nil)
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	// topicSearchButton := widget.NewButton("Поиск", nil)
 	tagEntry := widget.NewEntry()
 	tagEntry.TextStyle.Monospace = true
-	// tagSearchButton := widget.NewButton("Поиск", nil) // + возможность выбора
 	dateEntry := widget.NewEntry()
 	dateEntry.TextStyle.Monospace = true
-
-	// dateSearchButton := widget.NewButton("Поиск", nil) // заменить на элемент с датой
-	searchButton := widget.NewButton("Поиск", nil)
-	clearButton := widget.NewButton("Очистить", nil)
 
 	entryBox := container.NewVBox(
 		newlabel(""),
@@ -217,10 +235,8 @@ func mainForm() (box *fyne.Container) {
 		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
 		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagEntry),
 		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
-		container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton)),
+		// container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton)),
 	)
-	// searchBox2 := container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton))
-	// searchBox := container.NewVBox(searchBox1, searchBox2)
 
 	list = widget.NewList(
 		func() int {
@@ -253,9 +269,7 @@ func mainForm() (box *fyne.Container) {
 		dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
 	}
 
-	// panelBox := container.NewBorder(container.NewVBox(dirBox, searchBox), bottomBox, nil, nil)
-	// panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, container.NewVBox(searchBox))
-	panelBox := container.NewBorder(dirBox, bottomBox, nil, nil, entryBox)
+	panelBox := container.NewBorder(topBottom, bottomBox, nil, nil, entryBox)
 
 	split := container.NewHSplit(list, panelBox)
 
