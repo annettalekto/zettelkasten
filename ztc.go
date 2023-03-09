@@ -25,7 +25,7 @@ func main() {
 
 	a := app.New()
 	w := a.NewWindow(gProgramName)
-	w.Resize(fyne.NewSize(800, 600))
+	w.Resize(fyne.NewSize(900, 700))
 	w.CenterOnScreen()
 	w.SetMaster()
 
@@ -62,34 +62,27 @@ func main() {
 	}()
 
 	// NOTE:
-	/*
-			?решить проблемку \r \n (либо разбивку на строки делать както иначе, либо зачищать от символов, добавлять свой перевод строки в конце)
-			убрать txt из названия (добавить расширение как настройку (md, txt др)? - или лишнее усложнение)
-			добавить обновление списка файлов (по кнопке?) после создания файла хотя бы..
-			сохранить созданный файл в нужную -папку
-
-		+конвертировать все файлы - избавиться от BOM \ufeff
-			+день недели убрать из даты
-			+link
-			теги то с большой то с маленькой буквы
-			перевести доп файлы на .csv
-	*/
 	// прога для работы с сиситемой Zettelkasten
 	// будет сохранять файлы в определенном виде, ну и читать их
 	// Открыть: выбранный из списка файл в редакторе с возможностью сохранения
 	// Создать: ввод текста и доп. данных, сохранение в формате, запись в список тегов и тд
 
 	// Поиск попробоавать организовать так:
-	// строка ввод, кнопка поиск, возможность выбрать по тегу/имени и тд делать поиск
-	// добавить кнопку очиски
-	// возможность поиска из тех что уже найдены или вернуться к поиску по всему каталогу
+	// возможность поиска из тех что уже найдены или вернуться к поиску по всему каталогу (галочкой)
 
 	// сортировака по имени и дате (теме?)
 
 	// теги - есть файл со списком тегов, желательно в каком то виде вывести этот файл, чтобы
-	// можно было создавать  новые теги (то же темы и др). а так же можно сравнивать с этим список
+	// можно было создавать новые теги (то же темы и др). а так же можно сравнивать с этим список
 	// когда создается файл и указываются теги.
 	// в поиске можно использовать tagSelectEntry с выбором всех имеющихся, но при выводе файла  нужно отображать все
+
+	// ?решить проблемку \r \n (либо разбивку на строки делать както иначе, либо зачищать от символов, добавлять свой перевод строки в конце)
+	// убрать txt из названия (добавить расширение как настройку (md, txt др)? - или лишнее усложнение?)
+	// добавить обновление списка файлов (по кнопке?) после создания файла хотя бы.. лучше в потоке
+
+	// теги то с большой то с маленькой буквы - привести к общему виду
+	// перевести доп файлы на .csv?
 
 	w.SetContent(mainForm())
 	w.ShowAndRun()
@@ -143,6 +136,7 @@ func mainForm() (box *fyne.Container) {
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
 
+	// кнопки
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
 		data := fileRead(selectedFile.filePath)
@@ -156,16 +150,12 @@ func mainForm() (box *fyne.Container) {
 		data.filePath = filepath.Join(selectedDir, "new")
 		textEditor(data, "")
 	})
-	bottomBox := container.NewHBox(layout.NewSpacer(), createButton, openButton)
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
 		fmt.Printf("Ошибка: рабочая папка не открыта\n") // TODO: как обрабатывать ошибки
 		statusLabel.Text = "Ошибка: рабочая папка не открыта"
 	}
-	// for _, file := range files {
-	// 	fmt.Println(file.Name(), file.IsDir())
-	// }
 	dirLabel := widget.NewLabel(selectedDir)
 
 	dirButton := widget.NewButton("Каталог", func() {
@@ -210,12 +200,14 @@ func mainForm() (box *fyne.Container) {
 	searchSelect.SetSelected(topic)
 	searchEntry := widget.NewEntry()
 	searchEntry.TextStyle.Monospace = true
-	searchButton := widget.NewButton("Поиск", nil)
+	searchButton := widget.NewButton("  Поиск  ", nil)
 	clearButton := widget.NewButton("Очистить", func() {
 		searchEntry.SetText("")
 	})
-	searchButtonBox := container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton))
-	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, nil, searchEntry), searchLabel, searchButtonBox)
+	check := widget.NewCheck("Поиск по всей папке", func(b bool) {
+	})
+	searchButtonBox := container.NewBorder(nil, nil, check, searchButton)
+	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchLabel, searchButtonBox)
 
 	topBottom := container.NewVBox(dirBox, searchBox)
 
@@ -235,9 +227,10 @@ func mainForm() (box *fyne.Container) {
 		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
 		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagEntry),
 		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
-		// container.NewBorder(nil, nil, nil, container.NewHBox(clearButton, searchButton)),
+		container.NewHBox(createButton, layout.NewSpacer(), openButton),
 	)
 
+	// список
 	list = widget.NewList(
 		func() int {
 			return len(files)
@@ -269,10 +262,8 @@ func mainForm() (box *fyne.Container) {
 		dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
 	}
 
-	panelBox := container.NewBorder(topBottom, bottomBox, nil, nil, entryBox)
-
+	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
 	split := container.NewHSplit(list, panelBox)
-
 	box = container.NewBorder(nil, statusLabel, nil, nil, split)
 
 	return
