@@ -313,6 +313,7 @@ func textEditor(data fileType, text string) {
 	})
 
 	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
+		// todo: задавать вопрос только если были изменения (bool в поле ввода?)
 		d := dialog.NewConfirm("Вопрос", "Точно не сохранять?", func(b bool) {
 			if b {
 				w.Close()

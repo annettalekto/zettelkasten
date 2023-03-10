@@ -83,6 +83,9 @@ func main() {
 
 	// теги то с большой то с маленькой буквы - привести к общему виду
 	// перевести доп файлы на .csv?
+	// открывать по нажатию, а не через доп кнопку? (по дабл-клику хорошо бы) файл
+	// создать перенести в файл
+	// указание каталока перенести в файл
 
 	w.SetContent(mainForm())
 	w.ShowAndRun()
@@ -189,12 +192,11 @@ func mainForm() (box *fyne.Container) {
 		topic = "Тема" //переименовать
 		tag   = "Тег"
 	)
-	searchLabel := widget.NewLabel("подсказка как искать")
 	searchSelect := widget.NewSelect([]string{topic, tag}, func(value string) { // todo: дата
 		if value == topic {
-			searchLabel.SetText("Введите слова, которые должна содержать тема")
+			statusLabel.SetText("Введите слова, которые должна содержать тема")
 		} else if value == tag {
-			searchLabel.SetText("Введите один тег без знака #")
+			statusLabel.SetText("Введите один тег без знака #")
 		}
 	})
 	searchSelect.SetSelected(topic)
@@ -207,7 +209,7 @@ func mainForm() (box *fyne.Container) {
 	check := widget.NewCheck("Поиск по всей папке", func(b bool) {
 	})
 	searchButtonBox := container.NewBorder(nil, nil, check, searchButton)
-	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchLabel, searchButtonBox)
+	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchButtonBox)
 
 	topBottom := container.NewVBox(dirBox, searchBox)
 
