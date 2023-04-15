@@ -14,7 +14,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type fileType struct {
+type fileType struct { // ztcElementsType ztcBasicsType
 	filePath     string // полное имя файла с путем и расширением файла
 	topic        string
 	tags         []string
@@ -29,6 +29,104 @@ var selectedFile fileType
 fileRead - чтение файла filePath
 достаем из него всю информацию и складываем в структуру
 */
+// func fileRead(filePath string) (f fileType) { //todo: переименовать
+// 	bytes, err := os.ReadFile(filePath)
+// 	if err != nil { // todo: err
+// 		return
+// 	}
+
+// 	text := strings.Split(string(bytes), "\n")
+// 	f.filePath = filePath
+
+// 	// читаем однострочные
+// 	for _, line := range text {
+// 		if strings.Contains(line, "topic:") {
+// 			//line = strings.TrimPrefix(line, "topic:")
+// 			// f.topic = strings.TrimPrefix(line, " ")
+// 			f.topic = mTrimPrefix(line, "topic:")
+// 		}
+
+// 		if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
+// 			// line = strings.TrimPrefix(line, "tag:")
+// 			// line = strings.TrimPrefix(line, " ")
+// 			line = mTrimPrefix(line, "tag:")
+// 			slice := strings.Split(line, " ")
+// 			for _, s := range slice {
+// 				if s != "" {
+// 					// s = strings.TrimSuffix(s, " ")
+// 					// s = strings.TrimSuffix(s, "\r")
+// 					f.tags = append(f.tags, s)
+// 				}
+// 			}
+// 		}
+
+// 		if strings.Contains(line, "date:") {
+// 			// если есть доп. символы Parse не работает
+// 			s := mTrimPrefix(line, "date:")
+// 			// s = strings.TrimPrefix(s, " ")
+// 			// s = strings.TrimSuffix(s, "\r")
+// 			// s = strings.TrimSpace(s)
+// 			d, _ := time.Parse("02.01.2006 15:04", s)
+// 			// fmt.Println("v", d.Weekday())
+// 			// fmt.Println("v", d.Year())
+// 			f.date = d
+// 		}
+// 	}
+
+// 	// читаем многострочные
+// 	copy := false
+// 	minLen := 3
+// 	for _, line := range text {
+
+// 		if copy {
+// 			if strings.Contains(line, "_____") {
+// 				copy = false
+// 				break
+// 			}
+// 			lineNext := mTrimPrefix(line, " ")
+// 			if len(lineNext) > minLen {
+// 				f.links = append(f.links, lineNext)
+// 			}
+// 		}
+
+// 		if strings.Contains(line, "link:") {
+// 			copy = true
+// 			line0 := mTrimPrefix(line, "link:")
+// 			// line0 = strings.TrimPrefix(line0, " ")
+// 			// line0 = strings.TrimSuffix(line0, "\r")
+// 			if len(line0) > minLen {
+// 				f.links = append(f.links, line0)
+// 			}
+// 		}
+// 	}
+// 	for _, line := range text {
+
+// 		if copy {
+// 			if strings.Contains(line, "_____") {
+// 				copy = false
+// 				break
+// 			}
+// 			lineNext := mTrimPrefix(line, " ")
+// 			if len(lineNext) > minLen {
+// 				f.bindingFiles = append(f.bindingFiles, lineNext)
+// 			}
+// 		}
+
+// 		if strings.Contains(line, "bind:") {
+// 			copy = true
+// 			line0 := mTrimPrefix(line, "bind:")
+// 			// line0 = strings.TrimPrefix(line0, " ")
+// 			// line0 = strings.TrimSuffix(line0, "\r")
+// 			if len(line0) > minLen {
+// 				f.bindingFiles = append(f.bindingFiles, line0)
+// 			}
+// 		}
+// 	}
+
+// 	return
+// }
+
+// todo: переделать на теги
 func fileRead(filePath string) (f fileType) { //todo: переименовать
 	bytes, err := os.ReadFile(filePath)
 	if err != nil { // todo: err
