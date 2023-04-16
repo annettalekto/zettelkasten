@@ -117,7 +117,7 @@ func mainForm() (box *fyne.Container) {
 	// кнопки
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
-		data := fileRead(selectedFile.filePath)
+		data, _ := fileRead(selectedFile.filePath)
 		if data.filePath != "" { //todo: ???
 			textEditor(data, text)
 		}
@@ -227,7 +227,7 @@ func mainForm() (box *fyne.Container) {
 	list.OnSelected = func(id widget.ListItemID) {
 
 		filePath := filepath.Join(selectedDir, files[id].Name())
-		selectedFile = fileRead(filePath)
+		selectedFile, err = fileRead(filePath)
 
 		tags := ""
 		for _, tag := range selectedFile.tags {

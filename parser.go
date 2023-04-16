@@ -20,7 +20,7 @@ type fileType struct { // ztcElementsType ztcBasicsType
 	tags         []string
 	links        []string
 	bindingFiles []string
-	date         time.Time
+	date         time.Time // ну текст же
 }
 
 var selectedFile fileType
@@ -126,25 +126,88 @@ fileRead - чтение файла filePath
 // 	return
 // }
 
-// todo: переделать на теги
-func fileRead(filePath string) (f fileType) { //todo: переименовать
-	bytes, err := os.ReadFile(filePath)
-	if err != nil { // todo: err
+//Note: а если читать файл несколько раз? не переломиться... наверное
+
+func getTopic(filePath string) (s string, err error) {
+	bytes, _ := os.ReadFile(filePath) // ошибка проверена в ф. выше
+	// if err != nil {
+	// 	err = fmt.Errorf("file read (%s) error: %s", filePath, err.Error())
+	// 	return
+	// }
+
+	text := strings.Split(string(bytes), "\r\n")      //note: a new line character in Windows
+	text[0], _ = strings.CutPrefix(text[0], "\ufeff") // cut BOM
+
+	copy := false
+	stemp := ""
+	for _, line := range text {
+		if strings.Contains(line, "<topic>") {
+			copy = true
+		}
+		if copy {
+			stemp += line
+		}
+		if strings.Contains(line, "</topic>") {
+			copy = false
+		}
+	}
+	if stemp == "" {
+		err = fmt.Errorf("topic не найден")
 		return
 	}
+	s, err = cutTags("topic", stemp) // del tags
+	return
+}
 
-	text := strings.Split(string(bytes), "\n")
+// todo: вынести в отдельный файл
+func cutTags(tagName, before string) (s string, err error) {
+	ok := false
+	s = before // не изменять в случаи ошибки
+
+	before, ok = strings.CutPrefix(before, "<"+tagName+">")
+	if !ok {
+		err = fmt.Errorf("cut tags prexic error: %s", tagName)
+		return
+	}
+	before, ok = strings.CutSuffix(before, "</"+tagName+">")
+	if !ok {
+		err = fmt.Errorf("cut tags suffxic error: %s", tagName)
+		return
+	}
+	s = before
+
+	return
+}
+
+// todo: переделать на теги
+func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		err = fmt.Errorf("file read (%s) error: %s", filePath, err.Error())
+		fmt.Println(err)
+		return
+	}
 	f.filePath = filePath
 
+	f.topic, err = getTopic(filePath)
+	if err != nil {
+		fmt.Println(err) // todo: можно в лог писать кстати, а критичные еще в статус строке
+	}
+	// fmt.Println(f.topic, err) // debug ok
+
+	// todo: как писать в лог правильно, настроить вывод ош в статус лейбл. может какие то уровни ошибок сделать. читать
+
+	//--------------
+	text := strings.Split(string(bytes), "\n\r")
 	// читаем однострочные
 	for _, line := range text {
-		if strings.Contains(line, "topic:") {
+		if strings.Contains(line, "<topic>") {
 			//line = strings.TrimPrefix(line, "topic:")
 			// f.topic = strings.TrimPrefix(line, " ")
 			f.topic = mTrimPrefix(line, "topic:")
 		}
 
-		if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
+		/*if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
 			// line = strings.TrimPrefix(line, "tag:")
 			// line = strings.TrimPrefix(line, " ")
 			line = mTrimPrefix(line, "tag:")
@@ -156,9 +219,9 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 					f.tags = append(f.tags, s)
 				}
 			}
-		}
+		}*/
 
-		if strings.Contains(line, "date:") {
+		/*if strings.Contains(line, "date:") {
 			// если есть доп. символы Parse не работает
 			s := mTrimPrefix(line, "date:")
 			// s = strings.TrimPrefix(s, " ")
@@ -168,11 +231,12 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 			// fmt.Println("v", d.Weekday())
 			// fmt.Println("v", d.Year())
 			f.date = d
-		}
+		}*/
+
 	}
 
 	// читаем многострочные
-	copy := false
+	/*copy := false
 	minLen := 3
 	for _, line := range text {
 
@@ -196,8 +260,8 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 				f.links = append(f.links, line0)
 			}
 		}
-	}
-	for _, line := range text {
+	}*/
+	/*for _, line := range text {
 
 		if copy {
 			if strings.Contains(line, "_____") {
@@ -219,7 +283,7 @@ func fileRead(filePath string) (f fileType) { //todo: переименовать
 				f.bindingFiles = append(f.bindingFiles, line0)
 			}
 		}
-	}
+	}*/
 
 	return
 }
