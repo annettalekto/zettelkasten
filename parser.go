@@ -126,36 +126,36 @@ fileRead - чтение файла filePath
 // 	return
 // }
 
-//Note: а если читать файл несколько раз? не переломиться... наверное
+func getElementFromFile(filePath, tag string) (s string, err error) {
+	bytes, err := os.ReadFile(filePath)
+	if err != nil {
+		err = fmt.Errorf("getElementFromFile: file read (%s) error: %s", filePath, err.Error())
+		return
+	}
 
-func getTopic(filePath string) (s string, err error) {
-	bytes, _ := os.ReadFile(filePath) // ошибка проверена в ф. выше
-	// if err != nil {
-	// 	err = fmt.Errorf("file read (%s) error: %s", filePath, err.Error())
-	// 	return
-	// }
-
-	text := strings.Split(string(bytes), "\r\n")      //note: a new line character in Windows
-	text[0], _ = strings.CutPrefix(text[0], "\ufeff") // cut BOM
+	lines := strings.Split(string(bytes), "\r\n")       //note: a new line character in Windows
+	lines[0], _ = strings.CutPrefix(lines[0], "\ufeff") // cut BOM
 
 	copy := false
 	stemp := ""
-	for _, line := range text {
-		if strings.Contains(line, "<topic>") {
+	for _, line := range lines {
+		if strings.Contains(line, "<"+tag+">") { //todo: переписать на поиск подстроки, бред
 			copy = true
 		}
 		if copy {
-			stemp += line
+			line = strings.TrimSpace(line)
+			stemp += line + " "
 		}
-		if strings.Contains(line, "</topic>") {
+		if strings.Contains(line, "</"+tag+">") {
 			copy = false
+			stemp = strings.TrimSpace(stemp) // последний пробел лишний
 		}
 	}
-	if stemp == "" {
-		err = fmt.Errorf("get topic: not found")
-		return
-	}
-	s, err = cutTags("topic", stemp)
+	// if stemp == "" {
+	// 	err = fmt.Errorf("get topic: not found")
+	// 	return во первых это не ошибка, для многих полей, во вторых там пробелы
+	// }
+	s, err = cutTags(tag, stemp)
 	return
 }
 
@@ -182,63 +182,57 @@ func cutTags(tagName, before string) (s string, err error) {
 
 // todo: переделать на теги
 func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
-	bytes, err := os.ReadFile(filePath)
-	if err != nil {
-		err = fmt.Errorf("file read (%s) error: %w", filePath, err)
-		fmt.Println(err)
-		return
-	}
+	const (
+		tagTopic = "topic"
+		tagTag   = "tag"
+		tagText  = "text"
+		tagLink  = "link"
+		tagBind  = "bind"
+		tagDate  = "date"
+	)
+
+	// bytes, err := os.ReadFile(filePath)
+	// if err != nil {
+	// 	err = fmt.Errorf("file read (%s) error: %w", filePath, err)
+	// 	fmt.Println(err)
+	// 	return
+	// }
 	f.filePath = filePath
 
-	f.topic, err = getTopic(filePath)
-	if err != nil {
-		fmt.Println(err)
-		// todo: можно в лог писать кстати, а критичные еще в статус строке
-		// я хз честно
-		// тут не может быть крит ошибки, кроме не открывается файл, а он проверен
-		// так что с ними делать то
-	}
+	// f.topic, err = getElementFromFile(filePath, tagTopic)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	// todo: можно в лог писать кстати, а критичные еще в статус строке
+	// }
 	// fmt.Println(f.topic, err) // debug ok
 
-	// todo: как писать в лог правильно, настроить вывод ош в статус лейбл. может какие то уровни ошибок сделать. читать
+	temp := ""
+	temp, err = getElementFromFile(filePath, tagTag)
+	if err != nil {
+		fmt.Println(err)
+	}
+	f.tags = strings.Split(temp, " ")
+	fmt.Println(f.tags, err) // debug ok
+	fmt.Println(temp, err)   // debug ok
+
+	temp, err = getElementFromFile(filePath, tagLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// fmt.Println(temp, err) // debug ok
+	f.links = strings.Split(temp, " ")
+	fmt.Println(f.links, err)
+
+	// todo: как разделять метки для связи
+	/*temp, err = getElementFromFile(filePath, tagLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// fmt.Println(temp, err) // debug ok
+	f.links = strings.Split(temp, " ")
+	fmt.Println(f.links, err)*/
 
 	//--------------
-	text := strings.Split(string(bytes), "\n\r")
-	// читаем однострочные
-	for _, line := range text {
-		if strings.Contains(line, "<topic>") {
-			//line = strings.TrimPrefix(line, "topic:")
-			// f.topic = strings.TrimPrefix(line, " ")
-			f.topic = mTrimPrefix(line, "topic:")
-		}
-
-		/*if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
-			// line = strings.TrimPrefix(line, "tag:")
-			// line = strings.TrimPrefix(line, " ")
-			line = mTrimPrefix(line, "tag:")
-			slice := strings.Split(line, " ")
-			for _, s := range slice {
-				if s != "" {
-					// s = strings.TrimSuffix(s, " ")
-					// s = strings.TrimSuffix(s, "\r")
-					f.tags = append(f.tags, s)
-				}
-			}
-		}*/
-
-		/*if strings.Contains(line, "date:") {
-			// если есть доп. символы Parse не работает
-			s := mTrimPrefix(line, "date:")
-			// s = strings.TrimPrefix(s, " ")
-			// s = strings.TrimSuffix(s, "\r")
-			// s = strings.TrimSpace(s)
-			d, _ := time.Parse("02.01.2006 15:04", s)
-			// fmt.Println("v", d.Weekday())
-			// fmt.Println("v", d.Year())
-			f.date = d
-		}*/
-
-	}
 
 	// читаем многострочные
 	/*copy := false
