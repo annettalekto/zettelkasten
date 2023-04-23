@@ -152,17 +152,18 @@ func getTopic(filePath string) (s string, err error) {
 		}
 	}
 	if stemp == "" {
-		err = fmt.Errorf("topic не найден")
+		err = fmt.Errorf("get topic: not found")
 		return
 	}
-	s, err = cutTags("topic", stemp) // del tags
+	s, err = cutTags("topic", stemp)
 	return
 }
 
-// todo: вынести в отдельный файл
+// todo: вынести в отдельный файл если еще парачка будет
+// сделать ее универсальной, ориетнироваться на < > todo:
 func cutTags(tagName, before string) (s string, err error) {
 	ok := false
-	s = before // не изменять в случаи ошибки
+	s = before // не изменять в случае ошибки
 
 	before, ok = strings.CutPrefix(before, "<"+tagName+">")
 	if !ok {
@@ -183,7 +184,7 @@ func cutTags(tagName, before string) (s string, err error) {
 func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
 	bytes, err := os.ReadFile(filePath)
 	if err != nil {
-		err = fmt.Errorf("file read (%s) error: %s", filePath, err.Error())
+		err = fmt.Errorf("file read (%s) error: %w", filePath, err)
 		fmt.Println(err)
 		return
 	}
@@ -191,7 +192,11 @@ func fileRead(filePath string) (f fileType, err error) { //todo: переиме�
 
 	f.topic, err = getTopic(filePath)
 	if err != nil {
-		fmt.Println(err) // todo: можно в лог писать кстати, а критичные еще в статус строке
+		fmt.Println(err)
+		// todo: можно в лог писать кстати, а критичные еще в статус строке
+		// я хз честно
+		// тут не может быть крит ошибки, кроме не открывается файл, а он проверен
+		// так что с ними делать то
 	}
 	// fmt.Println(f.topic, err) // debug ok
 

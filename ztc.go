@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -29,10 +31,23 @@ func main() {
 	w.CenterOnScreen()
 	w.SetMaster()
 
+	// log в файл позже. каждый день новый файл? Папку создать ДО
+	// f, err := os.OpenFile(".\\logfiles\\info.log", os.O_RDWR|os.O_CREATE, 0666)
+	// if err != nil {
+	// 	err = fmt.Errorf("ERROR: log file %w", err)
+	// 	log.Fatal(err)
+	// }
+	// defer f.Close()
+	// пока лог в стд, так удобнее
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+	slog.Info("Start program", slog.String("version", runtime.Version()))
+
 	// регистрируем падение скрипта
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("!!!		Пааааника %c%c%c		!!!", 128561, 128561, 128561)
+			slog.Error("Panic")
 			os.Exit(1)
 		}
 	}()
