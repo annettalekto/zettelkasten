@@ -62,10 +62,16 @@ func main() {
 		fyne.NewMenu("Справка",
 			fyne.NewMenuItem("Посмотреть справку", func() { aboutHelp() }),
 			// fyne.NewMenuItemSeparator(),
-			fyne.NewMenuItem("О программе", func() { abautProgramm() }),
+			fyne.NewMenuItem("О программе", func() { aboutProgram() }),
 		),
 	)
 	w.SetMainMenu(menu)
+
+	tabs := container.NewAppTabs(
+		container.NewTabItem("вариант 1", mainForm()),
+		container.NewTabItem("вариант 2", newVar()),
+	)
+	tabs.SetTabLocation(container.TabLocationBottom)
 
 	go func() { // простите
 		time.Sleep(1 * time.Second)
@@ -76,7 +82,7 @@ func main() {
 		}
 	}()
 
-	w.SetContent(mainForm())
+	w.SetContent(tabs)
 	w.ShowAndRun()
 }
 
@@ -99,7 +105,7 @@ func aboutHelp() {
 	}
 }
 
-func abautProgramm() {
+func aboutProgram() {
 	w := fyne.CurrentApp().NewWindow("О программе") // CurrentApp!
 	w.Resize(fyne.NewSize(400, 150))
 	w.SetFixedSize(true)
@@ -121,6 +127,15 @@ func abautProgramm() {
 	// w.SetContent(fyne.NewContainerWithLayout(layout.NewCenterLayout(), box))
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
+}
+
+func newVar() (box *fyne.Container) {
+
+	lab := newlabel("test")
+	box = container.NewBorder(lab, nil, nil, nil)
+	// box.Add(lab)
+
+	return
 }
 
 func mainForm() (box *fyne.Container) {

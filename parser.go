@@ -20,7 +20,7 @@ type fileType struct { // ztcElementsType ztcBasicsType
 	tags         []string
 	links        []string
 	bindingFiles []string
-	date         time.Time // ну текст же
+	date         time.Time
 }
 
 var selectedFile fileType
