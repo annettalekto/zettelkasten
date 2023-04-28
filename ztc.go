@@ -131,12 +131,140 @@ func aboutProgram() {
 
 func newVar() (box *fyne.Container) {
 
-	lab := newlabel("test")
-	box = container.NewBorder(lab, nil, nil, nil)
-	// box.Add(lab)
+	var list *widget.List
+	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
+	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zet test"
+
+	// кнопки
+	openButton := widget.NewButton("Открыть", func() {
+		text := getText(selectedFile.filePath)
+		data, _ := fileRead(selectedFile.filePath)
+		if data.filePath != "" { //todo: ???
+			textEditor(data, text)
+		}
+	})
+	createButton := widget.NewButton("Создать", func() {
+		var data fileType
+		data.date = time.Now()
+		data.filePath = filepath.Join(selectedDir, "new")
+		textEditor(data, "")
+	})
+
+	files, err := os.ReadDir(selectedDir)
+	if err != nil {
+		fmt.Printf("Ошибка: рабочая папка не открыта\n") // TODO: как обрабатывать ошибки
+		statusLabel.Text = "Ошибка: рабочая папка не открыта"
+	}
+	dirLabel := widget.NewLabel(selectedDir)
+
+	dirButton := widget.NewButton("Каталог", func() {
+		dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
+			if r != nil && err == nil {
+				fmt.Println(r.URI())
+				selectedDir = filepath.Dir(r.URI().Path())
+				dirLabel.SetText(selectedDir)
+				files, _ = os.ReadDir(selectedDir)
+				list.Refresh()
+			}
+		},
+			fyne.CurrentApp().Driver().AllWindows()[0],
+		)
+
+		// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
+		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+		var dir fyne.ListableURI
+		d := storage.NewFileURI(selectedDir)
+		dir, _ = storage.ListerForURI(d)
+
+		dialog.SetLocation(dir)
+		dialog.SetConfirmText("Выбрать")
+		dialog.SetDismissText("Закрыть")
+		dialog.Show()
+	})
+	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
+
+	// поиск
+	const (
+		topic = "Тема" //переименовать
+		tag   = "Тег"
+	)
+	searchSelect := widget.NewSelect([]string{topic, tag}, func(value string) { // todo: дата
+		if value == topic {
+			statusLabel.SetText("Введите слова, которые должна содержать тема")
+		} else if value == tag {
+			statusLabel.SetText("Введите один тег без знака #")
+		}
+	})
+	searchSelect.SetSelected(topic)
+	searchEntry := widget.NewEntry()
+	searchEntry.TextStyle.Monospace = true
+	searchButton := widget.NewButton("  Поиск  ", nil)
+	clearButton := widget.NewButton("Очистить", func() {
+		searchEntry.SetText("")
+	})
+	check := widget.NewCheck("Поиск по всей папке", func(b bool) {
+	})
+	searchButtonBox := container.NewBorder(nil, nil, check, searchButton)
+	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchButtonBox)
+
+	topBottom := container.NewVBox(dirBox, searchBox)
+
+	topicEntry := widget.NewEntry()
+	topicEntry.TextStyle.Monospace = true
+
+	text := widget.NewMultiLineEntry()
+	add := `afsdgaerhgrh
+	WEFAWKJGF
+	NKJASNEFK;JAN
+	NEKLJNALSEK
+	ANSEODJNOEOIoahrg;'
+	anoerhga';`
+	text.SetText(add)
+
+	entryBox := container.NewVBox(
+		newlabel(""),
+		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
+		text,
+		container.NewHBox(createButton, layout.NewSpacer(), openButton),
+	)
+
+	// список
+	list = widget.NewList(
+		func() int {
+			return len(files)
+		},
+		func() fyne.CanvasObject {
+			var style fyne.TextStyle
+			style.Monospace = true
+			temp := widget.NewLabelWithStyle("temp", fyne.TextAlignLeading, style)
+			return temp
+		},
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			if i < len(files) {
+				o.(*widget.Label).SetText(files[i].Name())
+			}
+		})
+
+	list.OnSelected = func(id widget.ListItemID) {
+
+		filePath := filepath.Join(selectedDir, files[id].Name())
+		selectedFile, err = fileRead(filePath)
+
+		tags := ""
+		for _, tag := range selectedFile.tags {
+			tags += tag + " "
+		}
+		topicEntry.SetText(selectedFile.topic)
+	}
+
+	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
+	split := container.NewHSplit(list, panelBox)
+	box = container.NewBorder(nil, statusLabel, nil, nil, split)
 
 	return
 }
+
+//------------------------------------------------------------------------------------------
 
 func mainForm() (box *fyne.Container) {
 	var list *widget.List
