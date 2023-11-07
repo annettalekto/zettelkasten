@@ -54,14 +54,20 @@ func main() {
 
 	menu := fyne.NewMainMenu(
 		fyne.NewMenu("Файл",
-			// a quit item will be appended to our first menu
+			fyne.NewMenuItem("Создать новую карточку", nil),
+			fyne.NewMenuItem("Изменить каталог", nil),
+			fyne.NewMenuItemSeparator(),
+			fyne.NewMenuItem("Список тегов", nil),
+			fyne.NewMenuItem("Список оглавление", nil),
+			fyne.NewMenuItem("Список литературы", nil),
+		),
+		fyne.NewMenu("Вид",
 			fyne.NewMenuItem("Тема", func() { changeTheme(a) }),
-			// fyne.NewMenuItem("Выход", func() { a.Quit() }),
+			fyne.NewMenuItem("Сортировка", nil),
 		),
 
 		fyne.NewMenu("Справка",
 			fyne.NewMenuItem("Посмотреть справку", func() { aboutHelp() }),
-			// fyne.NewMenuItemSeparator(),
 			fyne.NewMenuItem("О программе", func() { aboutProgram() }),
 		),
 	)
@@ -74,7 +80,7 @@ func main() {
 	tabs.SetTabLocation(container.TabLocationBottom)
 
 	go func() { // простите
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 		for _, item := range menu.Items[0].Items {
 			if item.Label == "Quit" {
 				item.Label = "Выход"
