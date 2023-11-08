@@ -24,10 +24,12 @@ var gVersion, gYear, gProgramName string
 
 func main() {
 	gProgramName = "Zettelkasten"
+	gYear = "2023"
+	gVersion = "2" // сохр. в файл todo:
 
 	a := app.New()
 	w := a.NewWindow(gProgramName)
-	w.Resize(fyne.NewSize(900, 700))
+	w.Resize(fyne.NewSize(600, 400))
 	w.CenterOnScreen()
 	w.SetMaster()
 
@@ -74,8 +76,8 @@ func main() {
 	w.SetMainMenu(menu)
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("вариант 1", mainForm()),
-		container.NewTabItem("вариант 2", newVar()),
+		container.NewTabItem("вариант 1", mainForm1()),
+		container.NewTabItem("вариант 2", mainForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
 
@@ -92,73 +94,14 @@ func main() {
 	w.ShowAndRun()
 }
 
-var darkTheme bool
-
-func changeTheme(a fyne.App) {
-	darkTheme = !darkTheme
-
-	if darkTheme {
-		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
-	} else {
-		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantLight})
-	}
-}
-
-func aboutHelp() {
-	err := exec.Command("cmd", "/C", ".\\help\\index.html").Run()
-	if err != nil {
-		fmt.Println("Ошибка открытия файла справки")
-	}
-}
-
-func aboutProgram() {
-	w := fyne.CurrentApp().NewWindow("О программе") // CurrentApp!
-	w.Resize(fyne.NewSize(400, 150))
-	w.SetFixedSize(true)
-	w.CenterOnScreen()
-
-	img := canvas.NewImageFromURI(storage.NewFileURI("ind.png"))
-	img.Resize(fyne.NewSize(66, 90))
-	img.Move(fyne.NewPos(10, 10))
-
-	l0 := widget.NewLabel(gProgramName)
-	l0.Move(fyne.NewPos(80, 10))
-	l1 := widget.NewLabel(fmt.Sprintf("Версия %s", gVersion))
-	l1.Move(fyne.NewPos(80, 40))
-	l2 := widget.NewLabel(fmt.Sprintf("© Anna, %s", gYear))
-	l2.Move(fyne.NewPos(80, 70))
-
-	box := container.NewWithoutLayout(img, l0, l1, l2)
-
-	// w.SetContent(fyne.NewContainerWithLayout(layout.NewCenterLayout(), box))
-	w.SetContent(box)
-	w.Show() // ShowAndRun -- panic!
-}
-
-func newVar() (box *fyne.Container) {
+func mainForm() (box *fyne.Container) {
 
 	var list *widget.List
-	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
-	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zet test"
-
-	// кнопки
-	openButton := widget.NewButton("Открыть", func() {
-		text := getText(selectedFile.filePath)
-		data, _ := fileRead(selectedFile.filePath)
-		if data.filePath != "" { //todo: ???
-			textEditor(data, text)
-		}
-	})
-	createButton := widget.NewButton("Создать", func() {
-		var data fileType
-		data.date = time.Now()
-		data.filePath = filepath.Join(selectedDir, "new")
-		textEditor(data, "")
-	})
+	statusLabel := widget.NewLabel(" ")
+	selectedDir := "D:\\ztc test"
 
 	files, err := os.ReadDir(selectedDir)
 	if err != nil {
-		fmt.Printf("Ошибка: рабочая папка не открыта\n") // TODO: как обрабатывать ошибки
 		statusLabel.Text = "Ошибка: рабочая папка не открыта"
 	}
 	dirLabel := widget.NewLabel(selectedDir)
@@ -188,51 +131,32 @@ func newVar() (box *fyne.Container) {
 		dialog.Show()
 	})
 	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
-
-	// поиск
-	const (
-		topic = "Тема" //переименовать
-		tag   = "Тег"
-	)
-	searchSelect := widget.NewSelect([]string{topic, tag}, func(value string) { // todo: дата
-		if value == topic {
-			statusLabel.SetText("Введите слова, которые должна содержать тема")
-		} else if value == tag {
-			statusLabel.SetText("Введите один тег без знака #")
-		}
-	})
-	searchSelect.SetSelected(topic)
-	searchEntry := widget.NewEntry()
-	searchEntry.TextStyle.Monospace = true
-	searchButton := widget.NewButton("  Поиск  ", nil)
-	clearButton := widget.NewButton("Очистить", func() {
-		searchEntry.SetText("")
-	})
-	check := widget.NewCheck("Поиск по всей папке", func(b bool) {
-	})
-	searchButtonBox := container.NewBorder(nil, nil, check, searchButton)
-	searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchButtonBox)
-
-	topBottom := container.NewVBox(dirBox, searchBox)
-
-	topicEntry := widget.NewEntry()
-	topicEntry.TextStyle.Monospace = true
+	topBottom := container.NewVBox(dirBox) //?
 
 	text := widget.NewMultiLineEntry()
-	add := `afsdgaerhgrh
-	WEFAWKJGF
-	NKJASNEFK;JAN
-	NEKLJNALSEK
-	ANSEODJNOEOIoahrg;'
-	anoerhga';`
-	text.SetText(add)
+	text.SetText("text")
 
-	entryBox := container.NewVBox(
-		newlabel(""),
-		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
-		text,
-		container.NewHBox(createButton, layout.NewSpacer(), openButton),
-	)
+	openButton := widget.NewButton("Открыть", func() {
+		text := getText(selectedFile.filePath)
+		data, _ := fileRead(selectedFile.filePath)
+		if data.filePath != "" {
+			textEditor(data, text)
+		}
+	})
+	createButton := widget.NewButton("Создать", func() {
+		var data fileType
+		data.date = time.Now()
+		data.filePath = filepath.Join(selectedDir, "new")
+		textEditor(data, "")
+	})
+	topicEntry := widget.NewEntry()
+	topicEntry.TextStyle.Monospace = true
+	entr := container.NewBorder(nil, nil, newlabel("Topic:"), nil, topicEntry)
+
+	btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
+	bottom := container.NewVBox(entr, btn)
+
+	entryBox := container.NewBorder(nil, bottom, nil, nil, text)
 
 	// список
 	list = widget.NewList(
@@ -270,9 +194,51 @@ func newVar() (box *fyne.Container) {
 	return
 }
 
+var darkTheme bool
+
+func changeTheme(a fyne.App) {
+	darkTheme = !darkTheme
+
+	if darkTheme {
+		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
+	} else {
+		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantLight})
+	}
+}
+
+func aboutHelp() {
+	err := exec.Command("cmd", "/C", ".\\help\\index.html").Run()
+	if err != nil {
+		fmt.Println("Ошибка открытия файла справки")
+	}
+}
+
+func aboutProgram() {
+	w := fyne.CurrentApp().NewWindow("О программе")
+	w.Resize(fyne.NewSize(400, 150))
+	w.SetFixedSize(true)
+	w.CenterOnScreen()
+
+	img := canvas.NewImageFromURI(storage.NewFileURI("ind.png"))
+	img.Resize(fyne.NewSize(66, 90))
+	img.Move(fyne.NewPos(10, 10))
+
+	l0 := widget.NewLabel(gProgramName)
+	l0.Move(fyne.NewPos(80, 10))
+	l1 := widget.NewLabel(fmt.Sprintf("Версия %s", gVersion))
+	l1.Move(fyne.NewPos(80, 40))
+	l2 := widget.NewLabel(fmt.Sprintf("© Anna, %s", gYear))
+	l2.Move(fyne.NewPos(80, 70))
+
+	box := container.NewWithoutLayout(img, l0, l1, l2)
+
+	w.SetContent(box)
+	w.Show()
+}
+
 // ------------------------------------------------------------------------------------------
 // old
-func mainForm() (box *fyne.Container) {
+func mainForm1() (box *fyne.Container) {
 	var list *widget.List
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 	// selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
