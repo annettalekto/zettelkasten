@@ -3,20 +3,20 @@ package main
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 )
 
 func viewForm() *fyne.Container {
 
-	// название сверху и дата
+	// номер карты в шапке?
+	date := newFormatLabel("дата: 00.00.0000")
+	d := container.NewBorder(nil, nil, nil, date)
 	name := newFormatEntry()
-	date := newFormatLabel("дата:")
-	test := newFormatLabelAndEntry("ggg")
+	top := container.NewVBox(d, name)
 
-	box := container.NewVBox(name, date, test)
+	text := widget.NewMultiLineEntry()
 
-	// текст
-	// кнопка редактирования
+	bottom := container.NewBorder(nil, nil, nil, widget.NewButton("Редакт.", nil))
 
-	// box := container.NewHBox(widget.NewLabel("lasdk"))
-	return box
+	return container.NewBorder(top, bottom, nil, nil, text)
 }
