@@ -79,6 +79,7 @@ func main() {
 		container.NewTabItem("вариант 1", mainForm1()),
 		container.NewTabItem("вариант 2", mainForm()),
 		container.NewTabItem("просмотр", viewForm()),
+		container.NewTabItem("доп.", addInfoForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
 

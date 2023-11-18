@@ -20,3 +20,15 @@ func viewForm() *fyne.Container {
 
 	return container.NewBorder(top, bottom, nil, nil, text)
 }
+
+func addInfoForm() *fyne.Container {
+
+	name := newFormatEntry()
+
+	tabs := widget.NewMultiLineEntry()
+	binds := widget.NewMultiLineEntry()
+	source := widget.NewMultiLineEntry()
+	box := container.NewGridWithColumns(1, tabs, binds, source)
+
+	return container.NewBorder(name, nil, nil, nil, box)
+}
