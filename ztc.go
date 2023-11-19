@@ -152,7 +152,7 @@ func mainForm() (box *fyne.Container) {
 	})
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
-	entr := container.NewBorder(nil, nil, newlabel("Topic:"), nil, topicEntry)
+	entr := container.NewBorder(nil, nil, newFormatLabel("Topic:"), nil, topicEntry)
 
 	btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
 	bottom := container.NewVBox(entr, btn)
@@ -330,11 +330,11 @@ func mainForm1() (box *fyne.Container) {
 	dateEntry.TextStyle.Monospace = true
 
 	entryBox := container.NewVBox(
-		newlabel(""),
-		container.NewBorder(nil, nil, newlabel("Имя:  "), nil, fileNameEntry),
-		container.NewBorder(nil, nil, newlabel("Тема: "), nil, topicEntry),
-		container.NewBorder(nil, nil, newlabel("Теги: "), nil, tagEntry),
-		container.NewBorder(nil, nil, newlabel("Дата: "), nil, dateEntry),
+		newFormatLabel(""),
+		container.NewBorder(nil, nil, newFormatLabel("Имя:  "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Тема: "), nil, topicEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Теги: "), nil, tagEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Дата: "), nil, dateEntry),
 		container.NewHBox(createButton, layout.NewSpacer(), openButton),
 	)
 

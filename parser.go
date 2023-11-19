@@ -335,12 +335,6 @@ func getText(filePath string) (fileText string) {
 	return
 }
 
-func newlabel(labelName string) *widget.Label {
-	l := widget.NewLabel(labelName)
-	l.TextStyle.Monospace = true
-	return l
-}
-
 /*
 textEditor - открыть окно с текстом выбранного файла
 Сохранить изменения
@@ -375,12 +369,12 @@ func textEditor(data fileType, text string) {
 	linkMEntry.TextStyle.Monospace = true
 
 	entryBox := container.NewVBox(
-		container.NewBorder(nil, nil, newlabel("Имя:     "), nil, fileNameEntry),
-		container.NewBorder(nil, nil, newlabel("Тема:    "), nil, topicEntry),
-		container.NewBorder(nil, nil, newlabel("Теги:    "), nil, tagEntry),
-		container.NewBorder(nil, nil, newlabel("Дата:    "), nil, dateEntry),
-		container.NewBorder(nil, nil, newlabel("Связать: "), nil, bindingMEntry),
-		container.NewBorder(nil, nil, newlabel("Cсылки:  "), nil, linkMEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Имя:     "), nil, fileNameEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Тема:    "), nil, topicEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Теги:    "), nil, tagEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Дата:    "), nil, dateEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Связать: "), nil, bindingMEntry),
+		container.NewBorder(nil, nil, newFormatLabel("Cсылки:  "), nil, linkMEntry),
 	)
 
 	fileNameEntry.SetText(filepath.Base(data.filePath))
