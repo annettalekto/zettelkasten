@@ -92,15 +92,15 @@ func main() {
 	w.ShowAndRun()
 }
 
-var currentTheme bool // светлая тема false
+var darkTheme bool
 
 func changeTheme(a fyne.App) {
-	currentTheme = !currentTheme
+	darkTheme = !darkTheme
 
-	if currentTheme {
-		a.Settings().SetTheme(theme.DarkTheme()) // todo: шо
+	if darkTheme {
+		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantDark})
 	} else {
-		a.Settings().SetTheme(theme.LightTheme())
+		a.Settings().SetTheme(&forcedVariant{Theme: theme.DefaultTheme(), variant: theme.VariantLight})
 	}
 }
 
@@ -270,8 +270,8 @@ func newVar() (box *fyne.Container) {
 	return
 }
 
-//------------------------------------------------------------------------------------------
-
+// ------------------------------------------------------------------------------------------
+// old
 func mainForm() (box *fyne.Container) {
 	var list *widget.List
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
