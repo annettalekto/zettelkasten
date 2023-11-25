@@ -14,6 +14,20 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+type ztcBasicsType struct {
+	filePath     string
+	id           int
+	title        string
+	tags         []string
+	sourceNumber int
+	source       string
+	bindNumbers  []int
+	binds        []string
+	data         time.Time
+	quotation    string
+	comment      string
+}
+
 type fileType struct { // ztcElementsType ztcBasicsType
 	filePath     string // полное имя файла с путем и расширением файла
 	topic        string
@@ -24,6 +38,95 @@ type fileType struct { // ztcElementsType ztcBasicsType
 }
 
 var selectedFile fileType
+
+// todo: переделать на теги
+func fileRead2(filePath string) (f fileType, err error) { //todo: переименовать
+	const (
+		tagTopic = "title"
+	)
+
+	f.filePath = filePath
+
+	temp := ""
+	temp, err = getElementFromFile(filePath, tagTopic)
+	if err != nil {
+		fmt.Println(err)
+	}
+	f.tags = strings.Split(temp, " ")
+	fmt.Println(f.tags, err) // debug ok
+	fmt.Println(temp, err)   // debug ok
+
+	// temp, err = getElementFromFile(filePath, tagLink)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// // fmt.Println(temp, err) // debug ok
+	// f.links = strings.Split(temp, " ")
+	// fmt.Println(f.links, err)
+
+	// todo: как разделять метки для связи
+	/*temp, err = getElementFromFile(filePath, tagLink)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// fmt.Println(temp, err) // debug ok
+	f.links = strings.Split(temp, " ")
+	fmt.Println(f.links, err)*/
+
+	//--------------
+
+	// читаем многострочные
+	/*copy := false
+	minLen := 3
+	for _, line := range text {
+
+		if copy {
+			if strings.Contains(line, "_____") {
+				copy = false
+				break
+			}
+			lineNext := mTrimPrefix(line, " ")
+			if len(lineNext) > minLen {
+				f.links = append(f.links, lineNext)
+			}
+		}
+
+		if strings.Contains(line, "link:") {
+			copy = true
+			line0 := mTrimPrefix(line, "link:")
+			// line0 = strings.TrimPrefix(line0, " ")
+			// line0 = strings.TrimSuffix(line0, "\r")
+			if len(line0) > minLen {
+				f.links = append(f.links, line0)
+			}
+		}
+	}*/
+	/*for _, line := range text {
+
+		if copy {
+			if strings.Contains(line, "_____") {
+				copy = false
+				break
+			}
+			lineNext := mTrimPrefix(line, " ")
+			if len(lineNext) > minLen {
+				f.bindingFiles = append(f.bindingFiles, lineNext)
+			}
+		}
+
+		if strings.Contains(line, "bind:") {
+			copy = true
+			line0 := mTrimPrefix(line, "bind:")
+			// line0 = strings.TrimPrefix(line0, " ")
+			// line0 = strings.TrimSuffix(line0, "\r")
+			if len(line0) > minLen {
+				f.bindingFiles = append(f.bindingFiles, line0)
+			}
+		}
+	}*/
+
+	return
+}
 
 /*
 fileRead - чтение файла filePath
@@ -133,20 +236,20 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 		return
 	}
 
-	lines := strings.Split(string(bytes), "\r\n")       //note: a new line character in Windows
+	lines := strings.Split(string(bytes), "\n")         //note: a new line character in Windows  \r\n
 	lines[0], _ = strings.CutPrefix(lines[0], "\ufeff") // cut BOM
 
 	copy := false
 	stemp := ""
 	for _, line := range lines {
-		if strings.Contains(line, "<"+tag+">") { //todo: переписать на поиск подстроки, бред
+		if strings.Contains(line, "<!-- "+tag+" -->") {
 			copy = true
 		}
 		if copy {
 			line = strings.TrimSpace(line)
 			stemp += line + " "
 		}
-		if strings.Contains(line, "</"+tag+">") {
+		if strings.Contains(line, "<!--/"+tag+"-->") {
 			copy = false
 			stemp = strings.TrimSpace(stemp) // последний пробел лишний
 		}

@@ -75,6 +75,15 @@ func main() {
 	)
 	w.SetMainMenu(menu)
 
+	go func() { // простите
+		time.Sleep(2 * time.Second)
+		for _, item := range menu.Items[0].Items {
+			if item.Label == "Quit" {
+				item.Label = "Выход"
+			}
+		}
+	}()
+
 	tabs := container.NewAppTabs(
 		container.NewTabItem("вариант 1", mainForm1()),
 		container.NewTabItem("вариант 2", mainForm()),
@@ -84,15 +93,6 @@ func main() {
 		container.NewTabItem("коммент.", commentForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
-
-	go func() { // простите
-		time.Sleep(2 * time.Second)
-		for _, item := range menu.Items[0].Items {
-			if item.Label == "Quit" {
-				item.Label = "Выход"
-			}
-		}
-	}()
 
 	w.SetContent(tabs)
 	w.ShowAndRun()
@@ -142,7 +142,7 @@ func mainForm() (box *fyne.Container) {
 
 	openButton := widget.NewButton("Открыть", func() {
 		text := getText(selectedFile.filePath)
-		data, _ := fileRead(selectedFile.filePath)
+		data, _ := fileRead2(selectedFile.filePath)
 		if data.filePath != "" {
 			textEditor(data, text)
 		}
@@ -182,12 +182,8 @@ func mainForm() (box *fyne.Container) {
 	list.OnSelected = func(id widget.ListItemID) {
 
 		filePath := filepath.Join(selectedDir, files[id].Name())
-		selectedFile, err = fileRead(filePath)
+		selectedFile, err = fileRead2(filePath)
 
-		tags := ""
-		for _, tag := range selectedFile.tags {
-			tags += tag + " "
-		}
 		topicEntry.SetText(selectedFile.topic)
 	}
 
@@ -246,7 +242,7 @@ func mainForm1() (box *fyne.Container) {
 	var list *widget.List
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 	// selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
-	selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zet test"
+	selectedDir := "D:\\Ztc test"
 
 	// кнопки
 	openButton := widget.NewButton("Открыть", func() {
