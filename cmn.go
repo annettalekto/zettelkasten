@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -19,6 +17,6 @@ func newFormatEntry() *widget.Entry {
 }
 
 // todo: нужно?
-func newFormatLabelAndEntry(name string) *fyne.Container {
-	return container.NewBorder(nil, nil, newFormatLabel(name), nil, newFormatEntry())
-}
+// func newFormatLabelAndEntry(name string) *fyne.Container {
+// 	return container.NewBorder(nil, nil, newFormatLabel(name), nil, newFormatEntry())
+// }
