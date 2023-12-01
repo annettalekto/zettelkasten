@@ -85,7 +85,7 @@ func main() {
 	}()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("вариант 1", mainForm1()),
+		//container.NewTabItem("вариант 1", mainForm1()),
 		container.NewTabItem("вариант 2", mainForm()),
 		container.NewTabItem("просмотр", viewForm()),
 		container.NewTabItem("доп.", addInfoForm()),
@@ -141,11 +141,11 @@ func mainForm() (box *fyne.Container) {
 	text.SetText("text")
 
 	openButton := widget.NewButton("Открыть", func() {
-		text := getText(selectedFile.filePath)
-		data, _ := fileRead2(selectedFile.filePath)
-		if data.filePath != "" {
-			textEditor(data, text)
-		}
+		// text := getText(selectedFile.filePath)
+		// data, _ := fileRead2(selectedFile.filePath) данные уже в селект
+		// if data.filePath != "" {
+		// 	// textEditor(data, text)
+		// }
 	})
 	createButton := widget.NewButton("Создать", func() {
 		var data fileType
@@ -184,7 +184,7 @@ func mainForm() (box *fyne.Container) {
 		filePath := filepath.Join(selectedDir, files[id].Name())
 		selectedFile, err = fileRead2(filePath)
 
-		topicEntry.SetText(selectedFile.topic)
+		topicEntry.SetText(selectedFile.title)
 	}
 
 	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
@@ -356,8 +356,8 @@ func mainForm1() (box *fyne.Container) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		filePath := filepath.Join(selectedDir, files[id].Name())
-		selectedFile, err = fileRead(filePath)
+		// filePath := filepath.Join(selectedDir, files[id].Name())
+		// selectedFile, err = fileRead(filePath)
 
 		tags := ""
 		for _, tag := range selectedFile.tags {
@@ -365,8 +365,8 @@ func mainForm1() (box *fyne.Container) {
 		}
 		tagEntry.SetText(tags)
 		fileNameEntry.SetText(files[id].Name())
-		topicEntry.SetText(selectedFile.topic)
-		dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
+		// topicEntry.SetText(selectedFile.topic)
+		// dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
 	}
 
 	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)

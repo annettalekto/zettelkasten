@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,24 +38,50 @@ type fileType struct { // ztcElementsType ztcBasicsType
 	date         time.Time
 }
 
-var selectedFile fileType
+var selectedFile ztcBasicsType
 
 // todo: переделать на теги
-func fileRead2(filePath string) (f fileType, err error) { //todo: переименовать
+func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
 	const (
-		tagTopic = "title"
+		tagTopic        = "title"
+		tagId           = "id"
+		tagTags         = "tags"
+		tagSourceNumber = "source"
+		tagSource       = "source"
+		tagBindNumbers  = "bind"
+		tagBinds        = "bind"
+		tagData         = "date"
+		tagQuotation    = "quotation"
+		tagComment      = "comment"
 	)
-
-	f.filePath = filePath
-
 	temp := ""
+
+	ztc.filePath = filePath
+
+	// заглавие
 	temp, err = getElementFromFile(filePath, tagTopic)
 	if err != nil {
 		fmt.Println(err)
 	}
-	f.tags = strings.Split(temp, " ")
-	fmt.Println(f.tags, err) // debug ok
-	fmt.Println(temp, err)   // debug ok
+	ztc.title = temp
+
+	// номер карточки
+	temp, err = getElementFromFile(filePath, tagId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	sub := "_номер:_"
+	number := strings.Index(temp, sub)
+	temp = temp[number+len(sub):]
+	fmt.Println(len(temp))
+	temp = strings.TrimSpace(temp)
+	fmt.Println(len(temp))
+
+	id, err := strconv.Atoi(temp)
+	if err != nil {
+		fmt.Println(err) // todo: куда err
+	}
+	ztc.id = id
 
 	// temp, err = getElementFromFile(filePath, tagLink)
 	// if err != nil {
@@ -128,109 +155,9 @@ func fileRead2(filePath string) (f fileType, err error) { //todo: переиме
 	return
 }
 
-/*
-fileRead - чтение файла filePath
-достаем из него всю информацию и складываем в структуру
-*/
-// func fileRead(filePath string) (f fileType) { //todo: переименовать
-// 	bytes, err := os.ReadFile(filePath)
-// 	if err != nil { // todo: err
-// 		return
-// 	}
-
-// 	text := strings.Split(string(bytes), "\n")
-// 	f.filePath = filePath
-
-// 	// читаем однострочные
-// 	for _, line := range text {
-// 		if strings.Contains(line, "topic:") {
-// 			//line = strings.TrimPrefix(line, "topic:")
-// 			// f.topic = strings.TrimPrefix(line, " ")
-// 			f.topic = mTrimPrefix(line, "topic:")
-// 		}
-
-// 		if strings.Contains(line, "tag:") { // # слитно не используется для форматирования
-// 			// line = strings.TrimPrefix(line, "tag:")
-// 			// line = strings.TrimPrefix(line, " ")
-// 			line = mTrimPrefix(line, "tag:")
-// 			slice := strings.Split(line, " ")
-// 			for _, s := range slice {
-// 				if s != "" {
-// 					// s = strings.TrimSuffix(s, " ")
-// 					// s = strings.TrimSuffix(s, "\r")
-// 					f.tags = append(f.tags, s)
-// 				}
-// 			}
-// 		}
-
-// 		if strings.Contains(line, "date:") {
-// 			// если есть доп. символы Parse не работает
-// 			s := mTrimPrefix(line, "date:")
-// 			// s = strings.TrimPrefix(s, " ")
-// 			// s = strings.TrimSuffix(s, "\r")
-// 			// s = strings.TrimSpace(s)
-// 			d, _ := time.Parse("02.01.2006 15:04", s)
-// 			// fmt.Println("v", d.Weekday())
-// 			// fmt.Println("v", d.Year())
-// 			f.date = d
-// 		}
-// 	}
-
-// 	// читаем многострочные
-// 	copy := false
-// 	minLen := 3
-// 	for _, line := range text {
-
-// 		if copy {
-// 			if strings.Contains(line, "_____") {
-// 				copy = false
-// 				break
-// 			}
-// 			lineNext := mTrimPrefix(line, " ")
-// 			if len(lineNext) > minLen {
-// 				f.links = append(f.links, lineNext)
-// 			}
-// 		}
-
-// 		if strings.Contains(line, "link:") {
-// 			copy = true
-// 			line0 := mTrimPrefix(line, "link:")
-// 			// line0 = strings.TrimPrefix(line0, " ")
-// 			// line0 = strings.TrimSuffix(line0, "\r")
-// 			if len(line0) > minLen {
-// 				f.links = append(f.links, line0)
-// 			}
-// 		}
-// 	}
-// 	for _, line := range text {
-
-// 		if copy {
-// 			if strings.Contains(line, "_____") {
-// 				copy = false
-// 				break
-// 			}
-// 			lineNext := mTrimPrefix(line, " ")
-// 			if len(lineNext) > minLen {
-// 				f.bindingFiles = append(f.bindingFiles, lineNext)
-// 			}
-// 		}
-
-// 		if strings.Contains(line, "bind:") {
-// 			copy = true
-// 			line0 := mTrimPrefix(line, "bind:")
-// 			// line0 = strings.TrimPrefix(line0, " ")
-// 			// line0 = strings.TrimSuffix(line0, "\r")
-// 			if len(line0) > minLen {
-// 				f.bindingFiles = append(f.bindingFiles, line0)
-// 			}
-// 		}
-// 	}
-
-// 	return
-// }
-
 func getElementFromFile(filePath, tag string) (s string, err error) {
-	bytes, err := os.ReadFile(filePath)
+	var bytes []byte
+	bytes, err = os.ReadFile(filePath)
 	if err != nil {
 		err = fmt.Errorf("getElementFromFile: file read (%s) error: %s", filePath, err.Error())
 		return
@@ -239,36 +166,47 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 	lines := strings.Split(string(bytes), "\n")         //note: a new line character in Windows  \r\n
 	lines[0], _ = strings.CutPrefix(lines[0], "\ufeff") // cut BOM
 
+	// <!-- title --> #### Риторика <!-- /title -->
 	copy := false
 	stemp := ""
 	for _, line := range lines {
-		if strings.Contains(line, "<!-- "+tag+" -->") {
-			copy = true
+		if strings.Contains(line, "<!--") && strings.Contains(line, "/"+tag) { // закрывающий тэг
+			if strings.Count(line, tag) == 2 { // открывающий и закрывающий тег в одной строке
+				// искать между тегами одной строки
+				sub := "-->"
+				number := strings.Index(line, sub)
+				line = line[number+len(sub):]
+				sub = "<!"
+				number = strings.Index(line, sub)
+				stemp = line[:number]
+				break
+			}
+			copy = false
+			// stemp = strings.TrimSpace(stemp) // последний пробел лишний
+			break
 		}
 		if copy {
 			line = strings.TrimSpace(line)
 			stemp += line + " "
 		}
-		if strings.Contains(line, "<!--/"+tag+"-->") {
-			copy = false
-			stemp = strings.TrimSpace(stemp) // последний пробел лишний
+		if strings.Contains(line, "<!--") && strings.Contains(line, tag) {
+			copy = true
 		}
 	}
-	// if stemp == "" {
-	// 	err = fmt.Errorf("get topic: not found")
-	// 	return во первых это не ошибка, для многих полей, во вторых там пробелы
-	// }
-	s, err = cutTags(tag, stemp)
+	s = stemp
+
 	return
 }
 
 // todo: вынести в отдельный файл если еще парачка будет
 // сделать ее универсальной, ориетнироваться на < > todo:
-func cutTags(tagName, before string) (s string, err error) {
+//
+//	<!-- /title -->
+/*func cutTags(tagName, before string) (s string, err error) {
 	ok := false
 	s = before // не изменять в случае ошибки
 
-	before, ok = strings.CutPrefix(before, "<"+tagName+">")
+	before, ok = strings.CutPrefix(before, "t")
 	if !ok {
 		err = fmt.Errorf("cut tags prexic error: %s", tagName)
 		return
@@ -281,7 +219,7 @@ func cutTags(tagName, before string) (s string, err error) {
 	s = before
 
 	return
-}
+}*/
 
 // todo: переделать на теги
 func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
