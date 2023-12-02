@@ -83,6 +83,14 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	}
 	ztc.id = id
 
+	// теги
+	temp, err = getElementFromFile(filePath, tagTags)
+	if err != nil {
+		fmt.Println(err)
+	}
+	tempsl := strings.Split(temp, " ")
+	fmt.Println(tempsl)
+
 	// temp, err = getElementFromFile(filePath, tagLink)
 	// if err != nil {
 	// 	fmt.Println(err)
