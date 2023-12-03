@@ -43,16 +43,14 @@ var selectedFile ztcBasicsType
 // todo: переделать на теги
 func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
 	const (
-		tagTopic        = "title"
-		tagId           = "id"
-		tagTags         = "tags"
-		tagSourceNumber = "source"
-		tagSource       = "source"
-		tagBindNumbers  = "bind"
-		tagBinds        = "bind"
-		tagData         = "date"
-		tagQuotation    = "quotation"
-		tagComment      = "comment"
+		tagTopic     = "title"
+		tagId        = "id"
+		tagTags      = "tags"
+		tagSource    = "source"
+		tagBinds     = "bind"
+		tagData      = "date"
+		tagQuotation = "quotation"
+		tagComment   = "comment"
 	)
 	temp := ""
 
@@ -77,11 +75,11 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	temp = strings.TrimSpace(temp)
 	fmt.Println(len(temp))
 
-	id, err := strconv.Atoi(temp)
+	tempint, err := strconv.Atoi(temp)
 	if err != nil {
 		fmt.Println(err) // todo: куда err
 	}
-	ztc.id = id
+	ztc.id = tempint
 
 	// теги
 	temp, err = getElementFromFile(filePath, tagTags)
@@ -90,6 +88,30 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	}
 	tempsl := strings.Split(temp, " ")
 	fmt.Println(tempsl)
+	ztc.tags = tempsl
+
+	// номер и имя карточки источник
+	temp, err = getElementFromFile(filePath, tagSource)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// _источник:_ 10[[s10 - Фокус. Как сконцентрироваться на главном]]
+	sub = "_источник:_"
+	number = strings.Index(temp, sub)
+	temp = temp[number+len(sub):]
+	sub = "[["
+	number = strings.Index(temp, sub)
+	ztc.source = temp[number:]
+	temp = temp[:number]
+	temp = strings.TrimSpace(temp)
+	tempint, err = strconv.Atoi(temp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	ztc.sourceNumber = tempint
+	// ztc.source = strings.TrimLeft(ztc.source, "[[") надо выщитывать положение, пробелы
+	// ztc.source = strings.TrimRight(ztc.source, "]]")
+	fmt.Println(ztc.sourceNumber, ztc.source)
 
 	// temp, err = getElementFromFile(filePath, tagLink)
 	// if err != nil {
@@ -172,7 +194,7 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 	}
 
 	lines := strings.Split(string(bytes), "\n")         //note: a new line character in Windows  \r\n
-	lines[0], _ = strings.CutPrefix(lines[0], "\ufeff") // cut BOM
+	lines[0], _ = strings.CutPrefix(lines[0], "\ufeff") // cut BOM todo: strings.Split test
 
 	// <!-- title --> #### Риторика <!-- /title -->
 	copy := false
