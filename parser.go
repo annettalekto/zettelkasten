@@ -113,74 +113,20 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	// ztc.source = strings.TrimRight(ztc.source, "]]")
 	fmt.Println(ztc.sourceNumber, ztc.source)
 
-	// temp, err = getElementFromFile(filePath, tagLink)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// // fmt.Println(temp, err) // debug ok
-	// f.links = strings.Split(temp, " ")
-	// fmt.Println(f.links, err)
-
-	// todo: как разделять метки для связи
-	/*temp, err = getElementFromFile(filePath, tagLink)
+	// номера карточек связных с текущей
+	temp, err = getElementFromFile(filePath, tagBinds)
 	if err != nil {
 		fmt.Println(err)
 	}
-	// fmt.Println(temp, err) // debug ok
-	f.links = strings.Split(temp, " ")
-	fmt.Println(f.links, err)*/
+	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
+	temp1 := temp
+	sub = "[["
+	number = strings.Index(temp, sub)
+	temp = temp[:number] //_связное:_ 7, 1
 
-	//--------------
+	temp1 = temp1[number:] //[[7 - Изучение языков]] [[1 - Смысл]]
 
-	// читаем многострочные
-	/*copy := false
-	minLen := 3
-	for _, line := range text {
-
-		if copy {
-			if strings.Contains(line, "_____") {
-				copy = false
-				break
-			}
-			lineNext := mTrimPrefix(line, " ")
-			if len(lineNext) > minLen {
-				f.links = append(f.links, lineNext)
-			}
-		}
-
-		if strings.Contains(line, "link:") {
-			copy = true
-			line0 := mTrimPrefix(line, "link:")
-			// line0 = strings.TrimPrefix(line0, " ")
-			// line0 = strings.TrimSuffix(line0, "\r")
-			if len(line0) > minLen {
-				f.links = append(f.links, line0)
-			}
-		}
-	}*/
-	/*for _, line := range text {
-
-		if copy {
-			if strings.Contains(line, "_____") {
-				copy = false
-				break
-			}
-			lineNext := mTrimPrefix(line, " ")
-			if len(lineNext) > minLen {
-				f.bindingFiles = append(f.bindingFiles, lineNext)
-			}
-		}
-
-		if strings.Contains(line, "bind:") {
-			copy = true
-			line0 := mTrimPrefix(line, "bind:")
-			// line0 = strings.TrimPrefix(line0, " ")
-			// line0 = strings.TrimSuffix(line0, "\r")
-			if len(line0) > minLen {
-				f.bindingFiles = append(f.bindingFiles, line0)
-			}
-		}
-	}*/
+	fmt.Println(temp)
 
 	return
 }
