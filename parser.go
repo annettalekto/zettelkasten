@@ -20,9 +20,9 @@ type ztcBasicsType struct {
 	id           int
 	title        string
 	tags         []string
-	sourceNumber int
+	sourceNumber int // todo: а зачем переводить в числа?
 	source       string
-	bindNumbers  []int
+	bindNumbers  []string
 	binds        []string
 	data         time.Time
 	quotation    string
@@ -114,19 +114,28 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	fmt.Println(ztc.sourceNumber, ztc.source)
 
 	// номера карточек связных с текущей
+	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
 	temp, err = getElementFromFile(filePath, tagBinds)
 	if err != nil {
 		fmt.Println(err)
 	}
-	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
 	temp1 := temp
-	sub = "[["
+
+	sub = "[[" // todo: функ для парсинга этих в скобочках
 	number = strings.Index(temp, sub)
-	temp = temp[:number] //_связное:_ 7, 1
+	temp = temp[:number]                 //_связное:_ 7, 1
+	temp1 = temp1[number+len(sub):]      //[[7 - Изучение языков]] [[1 - Смысл]]
+	tempsl = strings.Split(temp1, "] [") // вот тут норм ф или удалить скобки
+	ztc.binds = tempsl
 
-	temp1 = temp1[number:] //[[7 - Изучение языков]] [[1 - Смысл]]
+	sub = "_связное:_"
+	number = strings.Index(temp, sub) // todo: может написать ф для выбора чисел?
+	temp = temp[number+len(sub):]
+	temp = strings.TrimSpace(temp)
+	tempsl = strings.Split(temp, ",")
+	ztc.bindNumbers = tempsl
 
-	fmt.Println(temp)
+	fmt.Println(ztc.bindNumbers, ztc.binds)
 
 	return
 }
