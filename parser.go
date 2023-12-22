@@ -40,6 +40,7 @@ type fileType struct { // ztcElementsType ztcBasicsType
 
 var selectedFile ztcBasicsType
 
+// todo: разбить на функции
 // todo: переделать на теги
 func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
 	const (
@@ -123,8 +124,19 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	sub = "[["
 	number = strings.Index(temp, sub)
 	ztc.bindNumbers = getAllNumbers(temp[:number]) //_связное:_ 7, 1
-
 	fmt.Println(ztc.bindNumbers, ztc.binds)
+
+	// дата
+	// <!-- date --> 2024-08-26 00:55 <!-- /date--> гггг мм дд
+	temp, err = getElementFromFile(filePath, tagData)
+	if err != nil {
+		fmt.Println(err)
+	}
+	dd, err := time.Parse("2006-01-02 15:04", temp) // todo: если будет хоть один лишний пробел по бокам то ошибка
+	if err != nil {
+		fmt.Println("error")
+	}
+	fmt.Println(dd)
 
 	return
 }
@@ -206,33 +218,10 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 			copy = true
 		}
 	}
-	s = stemp
+	s = strings.TrimSpace(stemp)
 
 	return
 }
-
-// todo: вынести в отдельный файл если еще парачка будет
-// сделать ее универсальной, ориетнироваться на < > todo:
-//
-//	<!-- /title -->
-/*func cutTags(tagName, before string) (s string, err error) {
-	ok := false
-	s = before // не изменять в случае ошибки
-
-	before, ok = strings.CutPrefix(before, "t")
-	if !ok {
-		err = fmt.Errorf("cut tags prexic error: %s", tagName)
-		return
-	}
-	before, ok = strings.CutSuffix(before, "</"+tagName+">")
-	if !ok {
-		err = fmt.Errorf("cut tags suffxic error: %s", tagName)
-		return
-	}
-	s = before
-
-	return
-}*/
 
 // todo: переделать на теги
 func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
