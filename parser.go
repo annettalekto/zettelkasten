@@ -119,15 +119,11 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	if err != nil {
 		fmt.Println(err)
 	}
-	temp1 := temp
+	ztc.binds = removeSquareBrackets(temp[number+len(sub):]) //[[7 - Изучение языков]] [[1 - Смысл]]
 
-	sub = "[[" // todo: функ для парсинга этих в скобочках
+	sub = "[["
 	number = strings.Index(temp, sub)
-	temp = temp[:number]                 //_связное:_ 7, 1
-	temp1 = temp1[number+len(sub):]      //[[7 - Изучение языков]] [[1 - Смысл]]
-	tempsl = strings.Split(temp1, "] [") // вот тут норм ф или удалить скобки
-	ztc.binds = tempsl
-
+	temp = temp[:number] //_связное:_ 7, 1
 	sub = "_связное:_"
 	number = strings.Index(temp, sub) // todo: может написать ф для выбора чисел?
 	temp = temp[number+len(sub):]
@@ -136,6 +132,30 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	ztc.bindNumbers = tempsl
 
 	fmt.Println(ztc.bindNumbers, ztc.binds)
+
+	return
+}
+
+// вынуть то что в квадратных скобках
+func removeSquareBrackets(s string) (ss []string) {
+	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
+
+	f := func() (elem string) {
+		sub := "[["
+		i := strings.Index(s, sub)
+		s = s[i+2:]
+
+		sub = "]]"
+		i = strings.Index(s, sub)
+		elem = s[:i]
+		s = s[i+2:] // обрезать строку
+
+		return elem
+	}
+
+	for strings.Count(s, "[[") > 0 {
+		ss = append(ss, f())
+	}
 
 	return
 }
