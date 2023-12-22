@@ -120,20 +120,28 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 		fmt.Println(err)
 	}
 	ztc.binds = removeSquareBrackets(temp[number+len(sub):]) //[[7 - Изучение языков]] [[1 - Смысл]]
-
 	sub = "[["
 	number = strings.Index(temp, sub)
-	temp = temp[:number] //_связное:_ 7, 1
-	sub = "_связное:_"
-	number = strings.Index(temp, sub) // todo: может написать ф для выбора чисел?
-	temp = temp[number+len(sub):]
-	temp = strings.TrimSpace(temp)
-	tempsl = strings.Split(temp, ",")
-	ztc.bindNumbers = tempsl
+	ztc.bindNumbers = getAllNumbers(temp[:number]) //_связное:_ 7, 1
 
 	fmt.Println(ztc.bindNumbers, ztc.binds)
 
 	return
+}
+
+// выбрать все числа
+func getAllNumbers(s string) []string {
+	var temp []rune
+
+	for _, r := range s[:] {
+		switch r {
+		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',':
+			temp = append(temp, r)
+		}
+	}
+	str := string(temp)
+
+	return strings.Split(str, ",")
 }
 
 // вынуть то что в квадратных скобках
