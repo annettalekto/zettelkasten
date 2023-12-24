@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -17,13 +16,13 @@ import (
 
 type ztcBasicsType struct {
 	filePath     string
-	id           int
+	id           string // todo: а зачем переводить в числа?
 	title        string
 	tags         []string
-	sourceNumber int // todo: а зачем переводить в числа?
-	source       string
+	sourceNumber []string // может ли быть несколько источников?
+	source       []string
 	bindNumbers  []string
-	binds        []string
+	bind         []string
 	data         time.Time
 	quotation    string
 	comment      string
@@ -40,8 +39,6 @@ type fileType struct { // ztcElementsType ztcBasicsType
 
 var selectedFile ztcBasicsType
 
-// todo: разбить на функции
-// todo: переделать на теги
 func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
 	const (
 		tagTopic     = "title"
@@ -58,73 +55,24 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	ztc.filePath = filePath
 
 	// заглавие
-	temp, err = getElementFromFile(filePath, tagTopic)
-	if err != nil {
-		fmt.Println(err)
-	}
-	ztc.title = temp
+	ztc.title = getTopicFromFile(filePath) // todo: разбить на функции
 
 	// номер карточки
-	temp, err = getElementFromFile(filePath, tagId)
-	if err != nil {
-		fmt.Println(err)
-	}
-	sub := "_номер:_"
-	number := strings.Index(temp, sub)
-	temp = temp[number+len(sub):]
-	fmt.Println(len(temp))
-	temp = strings.TrimSpace(temp)
-	fmt.Println(len(temp))
-
-	tempint, err := strconv.Atoi(temp)
-	if err != nil {
-		fmt.Println(err) // todo: куда err
-	}
-	ztc.id = tempint
+	ztc.id = getCardIdFromFile(filePath)
+	// tempint, err := strconv.Atoi(temp) // todo: переводить в числа?
+	// if err != nil {
+	// 	fmt.Println(err) // todo: куда err
+	// }
+	// ztc.id = tempint
 
 	// теги
-	temp, err = getElementFromFile(filePath, tagTags)
-	if err != nil {
-		fmt.Println(err)
-	}
-	tempsl := strings.Split(temp, " ")
-	fmt.Println(tempsl)
-	ztc.tags = tempsl
+	ztc.tags = getTagsFromFile(filePath)
 
 	// номер и имя карточки источник
-	temp, err = getElementFromFile(filePath, tagSource)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// _источник:_ 10[[s10 - Фокус. Как сконцентрироваться на главном]]
-	sub = "_источник:_"
-	number = strings.Index(temp, sub)
-	temp = temp[number+len(sub):]
-	sub = "[["
-	number = strings.Index(temp, sub)
-	ztc.source = temp[number:]
-	temp = temp[:number]
-	temp = strings.TrimSpace(temp)
-	tempint, err = strconv.Atoi(temp)
-	if err != nil {
-		fmt.Println(err)
-	}
-	ztc.sourceNumber = tempint
-	// ztc.source = strings.TrimLeft(ztc.source, "[[") надо выщитывать положение, пробелы
-	// ztc.source = strings.TrimRight(ztc.source, "]]")
-	fmt.Println(ztc.sourceNumber, ztc.source)
+	ztc.sourceNumber, ztc.source = getSourceFromFile(filePath)
 
 	// номера карточек связных с текущей
-	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
-	temp, err = getElementFromFile(filePath, tagBinds)
-	if err != nil {
-		fmt.Println(err)
-	}
-	ztc.binds = removeSquareBrackets(temp[number+len(sub):]) //[[7 - Изучение языков]] [[1 - Смысл]]
-	sub = "[["
-	number = strings.Index(temp, sub)
-	ztc.bindNumbers = getAllNumbers(temp[:number]) //_связное:_ 7, 1
-	fmt.Println(ztc.bindNumbers, ztc.binds)
+	ztc.bindNumbers, ztc.bind = getBindFromFile(filePath)
 
 	// дата
 	// <!-- date --> 2024-08-26 00:55 <!-- /date--> гггг мм дд
@@ -138,6 +86,69 @@ func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: пер�
 	}
 	fmt.Println(dd)
 
+	return
+}
+
+func getTopicFromFile(filePath string) (s string) {
+	const tagTopic = "title"
+	var err error
+
+	s, err = getElementFromFile(filePath, tagTopic)
+	if err != nil {
+		fmt.Println(err) // todo: куда выводить ошибки и нудо ли?
+	}
+	return s
+}
+
+func getCardIdFromFile(filePath string) (s string) {
+	const tagId = "id"
+	var err error
+
+	s, err = getElementFromFile(filePath, tagId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	sl := getAllNumbers(s)
+	fmt.Printf("%q", sl)
+	return sl[0]
+}
+
+func getTagsFromFile(filePath string) (sl []string) {
+	const tagTags = "tags"
+	var err error
+
+	s, err := getElementFromFile(filePath, tagTags)
+	if err != nil {
+		fmt.Println(err)
+	}
+	sl = strings.Split(s, " ")
+	fmt.Printf("%q", sl)
+	return sl
+}
+
+func getSourceFromFile(filePath string) (numbers, names []string) {
+	const tagSource = "source"
+
+	s, err := getElementFromFile(filePath, tagSource)
+	if err != nil {
+		fmt.Println(err)
+	}
+	numbers = getAllNumbers(s[:strings.Index(s, "[[")])
+	names = removeSquareBrackets(s)
+	fmt.Printf("%q", numbers, names)
+	return
+}
+
+func getBindFromFile(filePath string) (numbers, names []string) {
+	const tagBinds = "bind"
+	s, err := getElementFromFile(filePath, tagBinds)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
+	names = removeSquareBrackets(s)                     //
+	numbers = getAllNumbers(s[:strings.Index(s, "[[")]) //_связное:_ 7, 1
+	fmt.Printf("%q", numbers, names)
 	return
 }
 
