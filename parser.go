@@ -39,52 +39,29 @@ type fileType struct { // ztcElementsType ztcBasicsType
 
 var selectedFile ztcBasicsType
 
-func fileRead2(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
-	const (
-		tagTopic     = "title"
-		tagId        = "id"
-		tagTags      = "tags"
-		tagSource    = "source"
-		tagBinds     = "bind"
-		tagData      = "date"
-		tagQuotation = "quotation"
-		tagComment   = "comment"
-	)
-	temp := ""
-
+func fileRead(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
 	ztc.filePath = filePath
 
-	// заглавие
 	ztc.title = getTopicFromFile(filePath) // todo: разбить на функции
 
-	// номер карточки
 	ztc.id = getCardIdFromFile(filePath)
-	// tempint, err := strconv.Atoi(temp) // todo: переводить в числа?
+	// tempint, err := strconv.Atoi(temp) // todo переводить в числа?
 	// if err != nil {
-	// 	fmt.Println(err) // todo: куда err
+	// 	fmt.Println(err) // todo куда err
 	// }
 	// ztc.id = tempint
 
-	// теги
 	ztc.tags = getTagsFromFile(filePath)
 
-	// номер и имя карточки источник
 	ztc.sourceNumber, ztc.source = getSourceFromFile(filePath)
 
-	// номера карточек связных с текущей
 	ztc.bindNumbers, ztc.bind = getBindFromFile(filePath)
 
-	// дата
-	// <!-- date --> 2024-08-26 00:55 <!-- /date--> гггг мм дд
-	temp, err = getElementFromFile(filePath, tagData)
-	if err != nil {
-		fmt.Println(err)
-	}
-	dd, err := time.Parse("2006-01-02 15:04", temp) // todo: если будет хоть один лишний пробел по бокам то ошибка
-	if err != nil {
-		fmt.Println("error")
-	}
-	fmt.Println(dd)
+	ztc.data = getDataFromFile(filePath)
+
+	ztc.quotation = getQuotationFromFile(filePath)
+
+	ztc.comment = getCommentFromFile(filePath)
 
 	return
 }
@@ -97,7 +74,7 @@ func getTopicFromFile(filePath string) (s string) {
 	if err != nil {
 		fmt.Println(err) // todo: куда выводить ошибки и нудо ли?
 	}
-	return s
+	return
 }
 
 func getCardIdFromFile(filePath string) (s string) {
@@ -123,7 +100,7 @@ func getTagsFromFile(filePath string) (sl []string) {
 	}
 	sl = strings.Split(s, " ")
 	fmt.Printf("%q", sl)
-	return sl
+	return
 }
 
 func getSourceFromFile(filePath string) (numbers, names []string) {
@@ -135,7 +112,7 @@ func getSourceFromFile(filePath string) (numbers, names []string) {
 	}
 	numbers = getAllNumbers(s[:strings.Index(s, "[[")])
 	names = removeSquareBrackets(s)
-	fmt.Printf("%q", numbers, names)
+	fmt.Printf("%q %q", numbers, names)
 	return
 }
 
@@ -148,7 +125,47 @@ func getBindFromFile(filePath string) (numbers, names []string) {
 	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
 	names = removeSquareBrackets(s)                     //
 	numbers = getAllNumbers(s[:strings.Index(s, "[[")]) //_связное:_ 7, 1
-	fmt.Printf("%q", numbers, names)
+	fmt.Printf("%q %q", numbers, names)
+	return
+}
+
+func getDataFromFile(filePath string) (t time.Time) {
+	const tagData = "date"
+
+	s, err := getElementFromFile(filePath, tagData)
+	if err != nil {
+		fmt.Println(err)
+	}
+	t, err = time.Parse("2006-01-02 15:04", s) // todo: если будет хоть один лишний пробел по бокам то ошибка
+	if err != nil {
+		fmt.Println("error") // todo: вопрос куда ошибки и в какой форме
+	}
+	fmt.Println(t)
+
+	return
+}
+
+func getQuotationFromFile(filePath string) (s string) {
+	const tagQuotation = "quotation"
+	var err error
+
+	s, err = getElementFromFile(filePath, tagQuotation)
+	if err != nil {
+		fmt.Println("error")
+	}
+
+	return
+}
+
+func getCommentFromFile(filePath string) (s string) {
+	const tagComment = "comment"
+	var err error
+
+	s, err = getElementFromFile(filePath, tagComment)
+	if err != nil {
+		fmt.Println("error")
+	}
+
 	return
 }
 
@@ -230,113 +247,6 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 		}
 	}
 	s = strings.TrimSpace(stemp)
-
-	return
-}
-
-// todo: переделать на теги
-func fileRead(filePath string) (f fileType, err error) { //todo: переименовать
-	const (
-		tagTopic = "topic"
-		tagTag   = "tag"
-		tagText  = "text"
-		tagLink  = "link"
-		tagBind  = "bind"
-		tagDate  = "date"
-	)
-
-	// bytes, err := os.ReadFile(filePath)
-	// if err != nil {
-	// 	err = fmt.Errorf("file read (%s) error: %w", filePath, err)
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	f.filePath = filePath
-
-	// f.topic, err = getElementFromFile(filePath, tagTopic)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	// todo: можно в лог писать кстати, а критичные еще в статус строке
-	// }
-	// fmt.Println(f.topic, err) // debug ok
-
-	temp := ""
-	temp, err = getElementFromFile(filePath, tagTag)
-	if err != nil {
-		fmt.Println(err)
-	}
-	f.tags = strings.Split(temp, " ")
-	fmt.Println(f.tags, err) // debug ok
-	fmt.Println(temp, err)   // debug ok
-
-	temp, err = getElementFromFile(filePath, tagLink)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// fmt.Println(temp, err) // debug ok
-	f.links = strings.Split(temp, " ")
-	fmt.Println(f.links, err)
-
-	// todo: как разделять метки для связи
-	/*temp, err = getElementFromFile(filePath, tagLink)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// fmt.Println(temp, err) // debug ok
-	f.links = strings.Split(temp, " ")
-	fmt.Println(f.links, err)*/
-
-	//--------------
-
-	// читаем многострочные
-	/*copy := false
-	minLen := 3
-	for _, line := range text {
-
-		if copy {
-			if strings.Contains(line, "_____") {
-				copy = false
-				break
-			}
-			lineNext := mTrimPrefix(line, " ")
-			if len(lineNext) > minLen {
-				f.links = append(f.links, lineNext)
-			}
-		}
-
-		if strings.Contains(line, "link:") {
-			copy = true
-			line0 := mTrimPrefix(line, "link:")
-			// line0 = strings.TrimPrefix(line0, " ")
-			// line0 = strings.TrimSuffix(line0, "\r")
-			if len(line0) > minLen {
-				f.links = append(f.links, line0)
-			}
-		}
-	}*/
-	/*for _, line := range text {
-
-		if copy {
-			if strings.Contains(line, "_____") {
-				copy = false
-				break
-			}
-			lineNext := mTrimPrefix(line, " ")
-			if len(lineNext) > minLen {
-				f.bindingFiles = append(f.bindingFiles, lineNext)
-			}
-		}
-
-		if strings.Contains(line, "bind:") {
-			copy = true
-			line0 := mTrimPrefix(line, "bind:")
-			// line0 = strings.TrimPrefix(line0, " ")
-			// line0 = strings.TrimSuffix(line0, "\r")
-			if len(line0) > minLen {
-				f.bindingFiles = append(f.bindingFiles, line0)
-			}
-		}
-	}*/
 
 	return
 }
