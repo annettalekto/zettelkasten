@@ -1,26 +1,44 @@
 package main
 
 import (
+	"fmt"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-func viewForm() *fyne.Container {
+type viewType struct {
+	Text *widget.Entry
+	Date *widget.Label
+	Name *widget.Entry
+}
+
+var view viewType
+
+func refreshTabs() {
+	view.Date.SetText(fmt.Sprintf("%v", selectedFile.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
+	view.Name.SetText(selectedFile.title)
+	view.Text.SetText(getTextFromFile(selectedFile.filePath))
+}
+
+func (v *viewType) viewForm() *fyne.Container { // initViewForm
 
 	// номер карты в шапке?
-	date := newFormatLabel("дата: 00.00.0000")
-	d := container.NewBorder(nil, nil, nil, date)
-	name := newFormatEntry()
-	name.SetText("Имя файла")
-	top := container.NewVBox(d, name)
+	v.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
+	d := container.NewBorder(nil, nil, nil, v.Date)
+	v.Name = newFormatEntry()
+	v.Name.SetText("Имя файла")
+	top := container.NewVBox(d, v.Name)
 
-	text := widget.NewMultiLineEntry()
-	text.SetText("Текст")
+	v.Text = widget.NewMultiLineEntry()
+	v.Text.TextStyle.Monospace = true
+	v.Text.Wrapping = fyne.TextWrapWord
+	v.Text.SetText("Текст")
 
 	bottom := container.NewBorder(nil, nil, nil, widget.NewButton("Редакт.", nil))
 
-	return container.NewBorder(top, bottom, nil, nil, text)
+	return container.NewBorder(top, bottom, nil, nil, v.Text)
 }
 
 func addInfoForm() *fyne.Container {

@@ -117,6 +117,7 @@ func getDataFromFile(filePath string) (t time.Time) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	s = strings.TrimSpace(s)
 	t, err = time.Parse("2006-01-02 15:04", s) // todo: если будет хоть один лишний пробел по бокам то ошибка
 	if err != nil {
 		fmt.Println("error") // todo: вопрос куда ошибки и в какой форме

@@ -14,13 +14,13 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
 var gVersion, gYear, gProgramName string
+var gFilePath string
 
 func main() {
 	gProgramName = "Zettelkasten"
@@ -86,13 +86,12 @@ func main() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("список", mainForm()),
-		container.NewTabItem("просмотр", viewForm()),
+		container.NewTabItem("просмотр", view.viewForm()),
 		container.NewTabItem("доп.", addInfoForm()),
 		container.NewTabItem("источник", sourceInfoForm()),
 		container.NewTabItem("коммент.", commentForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
-
 	w.SetContent(tabs)
 	w.ShowAndRun()
 }
@@ -100,22 +99,23 @@ func main() {
 func mainForm() (box *fyne.Container) {
 
 	var list *widget.List
-	statusLabel := widget.NewLabel(" ")
-	selectedDir := "D:\\ztc test"
+	// statusLabel := widget.NewLabel(" ")
+	gFilePath = "D:\\ztc test"
 
-	files, err := os.ReadDir(selectedDir)
+	files, err := os.ReadDir(gFilePath)
 	if err != nil {
-		statusLabel.Text = "Ошибка: рабочая папка не открыта"
+		// 	statusLabel.Text = "Ошибка: рабочая папка не открыта"
+		fmt.Println("%v", err)
 	}
-	dirLabel := widget.NewLabel(selectedDir)
+	dirLabel := widget.NewLabel(gFilePath)
 
 	dirButton := widget.NewButton("Каталог", func() {
 		dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
 			if r != nil && err == nil {
 				fmt.Println(r.URI())
-				selectedDir = filepath.Dir(r.URI().Path())
-				dirLabel.SetText(selectedDir)
-				files, _ = os.ReadDir(selectedDir)
+				gFilePath = filepath.Dir(r.URI().Path())
+				dirLabel.SetText(gFilePath)
+				files, _ = os.ReadDir(gFilePath)
 				list.Refresh()
 			}
 		},
@@ -125,7 +125,7 @@ func mainForm() (box *fyne.Container) {
 		// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
 		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
 		var dir fyne.ListableURI
-		d := storage.NewFileURI(selectedDir)
+		d := storage.NewFileURI(gFilePath)
 		dir, _ = storage.ListerForURI(d)
 
 		dialog.SetLocation(dir)
@@ -141,7 +141,7 @@ func mainForm() (box *fyne.Container) {
 	text.Wrapping = fyne.TextWrapWord
 	text.SetText("text")
 
-	openButton := widget.NewButton("Открыть", func() {
+	/*openButton := widget.NewButton("Открыть", func() {
 		// text := getText(selectedFile.filePath)
 		// data, _ := fileRead(selectedFile.filePath)
 		// if data.filePath != "" {
@@ -153,14 +153,13 @@ func mainForm() (box *fyne.Container) {
 		// data.date = time.Now()
 		// data.filePath = filepath.Join(selectedDir, "new")
 		// textEditor(data, "")
-	})
+	})*/
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
 	entr := container.NewBorder(nil, nil, newFormatLabel("Topic:"), nil, topicEntry)
 
-	btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
-	bottom := container.NewVBox(entr, btn)
-
+	//btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
+	bottom := container.NewVBox(entr)
 	entryBox := container.NewBorder(nil, bottom, nil, nil, text)
 
 	// список
@@ -182,16 +181,18 @@ func mainForm() (box *fyne.Container) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		filePath := filepath.Join(selectedDir, files[id].Name()) // ???
-		selectedFile, err = fileRead(filePath)
+		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name()) // ???
+		selectedFile, err = fileRead(selectedFile.filePath)
 
-		topicEntry.SetText(getTopicFromFile(filePath))
-		text.SetText(getTextFromFile(filePath))
+		topicEntry.SetText(selectedFile.title)
+		text.SetText(getTextFromFile(selectedFile.filePath))
+
+		refreshTabs()
 	}
 
 	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
 	split := container.NewHSplit(list, panelBox)
-	box = container.NewBorder(nil, statusLabel, nil, nil, split)
+	box = container.NewBorder(nil, nil, nil, nil, split)
 
 	return
 }
