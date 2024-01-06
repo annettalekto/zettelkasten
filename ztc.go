@@ -85,8 +85,7 @@ func main() {
 	}()
 
 	tabs := container.NewAppTabs(
-		//container.NewTabItem("вариант 1", mainForm1()),
-		container.NewTabItem("вариант 2", mainForm()),
+		container.NewTabItem("список", mainForm()),
 		container.NewTabItem("просмотр", viewForm()),
 		container.NewTabItem("доп.", addInfoForm()),
 		container.NewTabItem("источник", sourceInfoForm()),
@@ -135,23 +134,25 @@ func mainForm() (box *fyne.Container) {
 		dialog.Show()
 	})
 	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
-	topBottom := container.NewVBox(dirBox) //?
+	topBottom := container.NewVBox(dirBox)
 
 	text := widget.NewMultiLineEntry()
+	text.TextStyle.Monospace = true
+	text.Wrapping = fyne.TextWrapWord
 	text.SetText("text")
 
 	openButton := widget.NewButton("Открыть", func() {
 		// text := getText(selectedFile.filePath)
-		// data, _ := fileRead2(selectedFile.filePath) данные уже в селект
+		// data, _ := fileRead(selectedFile.filePath)
 		// if data.filePath != "" {
 		// 	// textEditor(data, text)
 		// }
 	})
 	createButton := widget.NewButton("Создать", func() {
-		var data fileType
-		data.date = time.Now()
-		data.filePath = filepath.Join(selectedDir, "new")
-		textEditor(data, "")
+		// var data fileType
+		// data.date = time.Now()
+		// data.filePath = filepath.Join(selectedDir, "new")
+		// textEditor(data, "")
 	})
 	topicEntry := widget.NewEntry()
 	topicEntry.TextStyle.Monospace = true
@@ -181,10 +182,11 @@ func mainForm() (box *fyne.Container) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		filePath := filepath.Join(selectedDir, files[id].Name())
+		filePath := filepath.Join(selectedDir, files[id].Name()) // ???
 		selectedFile, err = fileRead(filePath)
 
-		topicEntry.SetText(selectedFile.title)
+		topicEntry.SetText(getTopicFromFile(filePath))
+		text.SetText(getTextFromFile(filePath))
 	}
 
 	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
@@ -234,144 +236,4 @@ func aboutProgram() {
 
 	w.SetContent(box)
 	w.Show()
-}
-
-// ------------------------------------------------------------------------------------------
-// old
-func mainForm1() (box *fyne.Container) {
-	// var list *widget.List
-	// statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
-	// // selectedDir := "C:\\Users\\Totoro\\Dropbox\\Zettelkasten"
-	// selectedDir := "D:\\Ztc test"
-
-	// кнопки
-	// openButton := widget.NewButton("Открыть", func() {
-	// 	text := getText(selectedFile.filePath)
-	// 	data, _ := fileRead(selectedFile.filePath)
-	// 	if data.filePath != "" { //todo: ???
-	// 		// textEditor(data, text)
-	// 	}
-	// })
-	// createButton := widget.NewButton("Создать", func() {
-	// 	var data fileType
-	// 	data.date = time.Now()
-	// 	data.filePath = filepath.Join(selectedDir, "new")
-	// 	textEditor(data, "")
-	// })
-
-	// files, err := os.ReadDir(selectedDir)
-	// if err != nil {
-	// 	fmt.Printf("Ошибка: рабочая папка не открыта\n") // TODO: как обрабатывать ошибки
-	// 	statusLabel.Text = "Ошибка: рабочая папка не открыта"
-	// }
-	// dirLabel := widget.NewLabel(selectedDir)
-
-	// dirButton := widget.NewButton("Каталог", func() {
-	// 	dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
-	// 		if r != nil && err == nil {
-	// 			fmt.Println(r.URI())
-	// 			selectedDir = filepath.Dir(r.URI().Path())
-	// 			dirLabel.SetText(selectedDir)
-	// 			files, _ = os.ReadDir(selectedDir)
-	// 			list.Refresh()
-	// 		}
-	// 	},
-	// 		fyne.CurrentApp().Driver().AllWindows()[0],
-	// 	)
-
-	// 	// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
-	// 	// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
-	// 	var dir fyne.ListableURI
-	// 	d := storage.NewFileURI(selectedDir)
-	// 	dir, _ = storage.ListerForURI(d)
-
-	// 	dialog.SetLocation(dir)
-	// 	dialog.SetConfirmText("Выбрать")
-	// 	dialog.SetDismissText("Закрыть")
-	// 	dialog.Show()
-	// })
-	// dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
-
-	// // поиск
-	// const (
-	// 	topic = "Тема" //переименовать
-	// 	tag   = "Тег"
-	// )
-	// searchSelect := widget.NewSelect([]string{topic, tag}, func(value string) { // todo: дата
-	// 	if value == topic {
-	// 		statusLabel.SetText("Введите слова, которые должна содержать тема")
-	// 	} else if value == tag {
-	// 		statusLabel.SetText("Введите один тег без знака #")
-	// 	}
-	// })
-	// searchSelect.SetSelected(topic)
-	// searchEntry := widget.NewEntry()
-	// searchEntry.TextStyle.Monospace = true
-	// searchButton := widget.NewButton("  Поиск  ", nil)
-	// clearButton := widget.NewButton("Очистить", func() {
-	// 	searchEntry.SetText("")
-	// })
-	// check := widget.NewCheck("Поиск по всей папке", func(b bool) {
-	// })
-	// searchButtonBox := container.NewBorder(nil, nil, check, searchButton)
-	// searchBox := container.NewVBox(widget.NewLabel(""), container.NewBorder(nil, nil, searchSelect, clearButton, searchEntry), searchButtonBox)
-
-	// topBottom := container.NewVBox(dirBox, searchBox)
-
-	// // краткое отображение карточки
-	// fileNameEntry := widget.NewEntry()
-	// fileNameEntry.TextStyle.Monospace = true
-	// topicEntry := widget.NewEntry()
-	// topicEntry.TextStyle.Monospace = true
-	// tagEntry := widget.NewEntry()
-	// tagEntry.TextStyle.Monospace = true
-	// dateEntry := widget.NewEntry()
-	// dateEntry.TextStyle.Monospace = true
-
-	// entryBox := container.NewVBox(
-	// 	newFormatLabel(""),
-	// 	container.NewBorder(nil, nil, newFormatLabel("Имя:  "), nil, fileNameEntry),
-	// 	container.NewBorder(nil, nil, newFormatLabel("Тема: "), nil, topicEntry),
-	// 	container.NewBorder(nil, nil, newFormatLabel("Теги: "), nil, tagEntry),
-	// 	container.NewBorder(nil, nil, newFormatLabel("Дата: "), nil, dateEntry),
-	// 	// container.NewHBox(createButton, layout.NewSpacer(), openButton),
-	// )
-
-	// // список
-	// list = widget.NewList(
-	// 	func() int {
-	// 		return len(files)
-	// 	},
-	// 	func() fyne.CanvasObject {
-	// 		var style fyne.TextStyle
-	// 		style.Monospace = true
-	// 		temp := widget.NewLabelWithStyle("temp", fyne.TextAlignLeading, style)
-	// 		return temp
-	// 	},
-	// 	func(i widget.ListItemID, o fyne.CanvasObject) {
-	// 		if i < len(files) {
-	// 			o.(*widget.Label).SetText(files[i].Name())
-	// 		}
-	// 	})
-
-	// list.OnSelected = func(id widget.ListItemID) {
-
-	// 	// filePath := filepath.Join(selectedDir, files[id].Name())
-	// 	// selectedFile, err = fileRead(filePath)
-
-	// 	tags := ""
-	// 	for _, tag := range selectedFile.tags {
-	// 		tags += tag + " "
-	// 	}
-	// 	tagEntry.SetText(tags)
-	// 	fileNameEntry.SetText(files[id].Name())
-	// 	// topicEntry.SetText(selectedFile.topic)
-	// 	// dateEntry.SetText(selectedFile.date.Format("02.01.2006 15:04"))
-	// }
-
-	// panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
-	// split := container.NewHSplit(list, panelBox)
-	// box = container.NewBorder(nil, statusLabel, nil, nil, split)
-
-	return
 }

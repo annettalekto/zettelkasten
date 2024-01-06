@@ -3,15 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
-
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
 )
 
 type ztcBasicsType struct {
@@ -24,44 +17,32 @@ type ztcBasicsType struct {
 	bindNumbers  []string
 	bind         []string
 	data         time.Time
-	quotation    string
-	comment      string
+	// quotation    string
+	// comment      string
 }
 
-type fileType struct { // ztcElementsType ztcBasicsType
-	filePath     string // полное имя файла с путем и расширением файла
-	topic        string
-	tags         []string
-	links        []string
-	bindingFiles []string
-	date         time.Time
-}
+// type fileType struct { // ztcElementsType ztcBasicsType
+// 	filePath     string // полное имя файла с путем и расширением файла
+// 	topic        string
+// 	tags         []string
+// 	links        []string
+// 	bindingFiles []string
+// 	date         time.Time
+// }
 
 var selectedFile ztcBasicsType
 
-func fileRead(filePath string) (ztc ztcBasicsType, err error) { //todo: переименовать
+func fileRead(filePath string) (ztc ztcBasicsType, err error) {
+
 	ztc.filePath = filePath
-
-	ztc.title = getTopicFromFile(filePath) // todo: разбить на функции
-
+	ztc.title = getTopicFromFile(filePath)
 	ztc.id = getCardIdFromFile(filePath)
-	// tempint, err := strconv.Atoi(temp) // todo переводить в числа?
-	// if err != nil {
-	// 	fmt.Println(err) // todo куда err
-	// }
-	// ztc.id = tempint
-
 	ztc.tags = getTagsFromFile(filePath)
-
 	ztc.sourceNumber, ztc.source = getSourceFromFile(filePath)
-
 	ztc.bindNumbers, ztc.bind = getBindFromFile(filePath)
-
 	ztc.data = getDataFromFile(filePath)
-
-	ztc.quotation = getQuotationFromFile(filePath)
-
-	ztc.comment = getCommentFromFile(filePath)
+	// ztc.quotation = getQuotationFromFile(filePath)
+	// ztc.comment = getCommentFromFile(filePath)
 
 	return
 }
@@ -145,6 +126,18 @@ func getDataFromFile(filePath string) (t time.Time) {
 	return
 }
 
+func getTextFromFile(filePath string) (s string) {
+	const tagText = "text"
+	var err error
+
+	s, err = getElementFromFile(filePath, tagText)
+	if err != nil {
+		fmt.Println("error")
+	}
+
+	return
+}
+
 func getQuotationFromFile(filePath string) (s string) {
 	const tagQuotation = "quotation"
 	var err error
@@ -186,7 +179,6 @@ func getAllNumbers(s string) []string {
 
 // вынуть то что в квадратных скобках
 func removeSquareBrackets(s string) (ss []string) {
-	// _связное:_ 7, 1 [[7 - Изучение языков]] [[1 - Смысл]]
 
 	f := func() (elem string) {
 		sub := "[["
@@ -251,6 +243,7 @@ func getElementFromFile(filePath, tag string) (s string, err error) {
 	return
 }
 
+/*
 func mTrimPrefix(s, prefix string) string {
 
 	if strings.HasPrefix(s, prefix) {
@@ -259,12 +252,13 @@ func mTrimPrefix(s, prefix string) string {
 	s = strings.TrimSpace(s)
 	s = strings.TrimSuffix(s, "\r")
 	return s
-}
+}*/
 
 /*
 getText - прочитать файл,
 вернуть только текст заметки
 */
+/*
 func getText(filePath string) (fileText string) {
 
 	bytes, err := os.ReadFile(filePath)
@@ -297,13 +291,14 @@ func getText(filePath string) (fileText string) {
 	}
 
 	return
-}
+}*/
 
 /*
 textEditor - открыть окно с текстом выбранного файла
 Сохранить изменения
 Закрыть без сохранения
 */
+/*
 func textEditor(data fileType, text string) {
 	statusLabel := widget.NewLabel("Тут что-нибудь отладочное...")
 
@@ -450,12 +445,12 @@ func textEditor(data fileType, text string) {
 	box := container.NewBorder(entryBox, container.NewBorder(nil, bottomBox, nil, btn), nil, nil, textEntry)
 	w.SetContent(box)
 	w.Show() // ShowAndRun -- panic!
-}
+}*/
 
 /*
 сохраняет данные из структуры в формате ztc
 */
-func saveFile(data fileType, text string) error {
+/*func saveFile(data fileType, text string) error {
 	sep := "____________________________________________________________\r\n"
 
 	textall := "topic: " + data.topic + "\r\n"
@@ -485,4 +480,4 @@ func saveFile(data fileType, text string) error {
 	err := os.WriteFile(data.filePath, []byte(textall), 0666)
 
 	return err
-}
+}*/
