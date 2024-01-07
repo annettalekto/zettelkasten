@@ -99,5 +99,6 @@ func (z *ztcBasicsType) refreshTabs() {
 	addInfoForm.Binds.SetText(fmt.Sprintf("%q", z.bind))
 	addInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
 	sourceInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
+	sourceInfoForm.Quotation.SetText(getQuotationFromFile(z.filePath))
 	commentForm.Comment.SetText(getCommentFromFile(z.filePath))
 }
