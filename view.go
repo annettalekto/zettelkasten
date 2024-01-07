@@ -14,15 +14,9 @@ type viewType struct {
 	Name *widget.Entry
 }
 
-var view viewType
+var viewForm viewType
 
-func refreshTabs() {
-	view.Date.SetText(fmt.Sprintf("%v", selectedFile.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
-	view.Name.SetText(selectedFile.title)
-	view.Text.SetText(getTextFromFile(selectedFile.filePath))
-}
-
-func (v *viewType) viewForm() *fyne.Container { // initViewForm
+func (v *viewType) initForm() *fyne.Container {
 
 	// номер карты в шапке?
 	v.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
@@ -41,35 +35,69 @@ func (v *viewType) viewForm() *fyne.Container { // initViewForm
 	return container.NewBorder(top, bottom, nil, nil, v.Text)
 }
 
-func addInfoForm() *fyne.Container {
-
-	name := newFormatEntry()
-	name.SetText("Имя файла")
-
-	tegs := widget.NewMultiLineEntry()
-	tegs.SetText("#тег1\n#тег2")
-	binds := widget.NewMultiLineEntry()
-	binds.SetText("Связное")
-	source := widget.NewMultiLineEntry()
-	source.SetText("Источники")
-	box := container.NewGridWithColumns(1, tegs, binds, source)
-
-	return container.NewBorder(name, nil, nil, nil, box)
+type addInfoType struct {
+	Name   *widget.Entry
+	Tegs   *widget.Entry
+	Binds  *widget.Entry
+	Source *widget.Entry
 }
 
-func sourceInfoForm() *fyne.Container {
-	source := widget.NewMultiLineEntry()
-	source.SetText("Источник")
+var addInfoForm addInfoType
 
-	quotation := widget.NewMultiLineEntry()
-	quotation.SetText("Цитата")
+func (a *addInfoType) initForm() *fyne.Container {
 
-	return container.NewGridWithColumns(1, source, quotation) // todo: разделить
+	a.Name = newFormatEntry()
+	a.Name.SetText("Имя файла")
+
+	a.Tegs = widget.NewMultiLineEntry()
+	a.Tegs.SetText("#тег1\n#тег2")
+	a.Binds = widget.NewMultiLineEntry()
+	a.Binds.SetText("Связное")
+	a.Source = widget.NewMultiLineEntry()
+	a.Source.SetText("Источники")
+	box := container.NewGridWithColumns(1, a.Tegs, a.Binds, a.Source)
+
+	return container.NewBorder(a.Name, nil, nil, nil, box)
 }
 
-func commentForm() *fyne.Container {
-	comment := widget.NewMultiLineEntry()
-	comment.SetText("Комментарий")
+type sourceInfoType struct {
+	Source    *widget.Entry
+	Quotation *widget.Entry
+}
 
-	return container.NewGridWithColumns(1, comment)
+var sourceInfoForm sourceInfoType
+
+func (s *sourceInfoType) initForm() *fyne.Container {
+	s.Source = widget.NewMultiLineEntry()
+	s.Source.SetText("Источник")
+
+	s.Quotation = widget.NewMultiLineEntry()
+	s.Quotation.SetText("Цитата")
+
+	return container.NewGridWithColumns(1, s.Source, s.Quotation) // todo: разделить
+}
+
+type commentType struct {
+	Comment *widget.Entry
+}
+
+var commentForm commentType
+
+func (c *commentType) initForm() *fyne.Container {
+	c.Comment = widget.NewMultiLineEntry()
+	c.Comment.SetText("Комментарий")
+
+	return container.NewGridWithColumns(1, c.Comment)
+}
+
+func (z *ztcBasicsType) refreshTabs() {
+	viewForm.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
+	viewForm.Name.SetText(z.title)
+	viewForm.Text.SetText(getTextFromFile(z.filePath))
+	addInfoForm.Name.SetText(z.title)
+	addInfoForm.Tegs.SetText(fmt.Sprintf("%q", z.tags))
+	addInfoForm.Binds.SetText(fmt.Sprintf("%q", z.bind))
+	addInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
+	sourceInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
+	commentForm.Comment.SetText(getCommentFromFile(z.filePath))
 }
