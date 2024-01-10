@@ -20,3 +20,10 @@ func newFormatEntry() *widget.Entry {
 // func newFormatLabelAndEntry(name string) *fyne.Container {
 // 	return container.NewBorder(nil, nil, newFormatLabel(name), nil, newFormatEntry())
 // }
+
+func formatSlice(sl []string) (text string) {
+	for _, s := range sl {
+		text += s + "\n"
+	}
+	return
+}

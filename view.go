@@ -92,6 +92,7 @@ func (c *commentType) initForm() *fyne.Container {
 }
 
 func refreshTabs(z ztcBasicsType) {
+
 	viewForm.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
 	if len(z.title) > 1 {
 		viewForm.Name.SetText(z.title)
@@ -99,21 +100,25 @@ func refreshTabs(z ztcBasicsType) {
 	}
 
 	if len(z.tags) > 0 {
-		addInfoForm.Tegs.SetText(fmt.Sprintf("%q", z.tags))
+		addInfoForm.Tegs.SetText(formatSlice(z.tags))
 	}
+
 	if len(z.bind) > 0 {
-		addInfoForm.Binds.SetText(fmt.Sprintf("%q", z.bind))
+		addInfoForm.Binds.SetText(formatSlice(z.bind))
 	}
+
 	if len(z.source) > 0 {
-		addInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
-		sourceInfoForm.Source.SetText(fmt.Sprintf("%q", z.source))
+		addInfoForm.Source.SetText(formatSlice(z.source))
+		sourceInfoForm.Source.SetText(formatSlice(z.source))
 	}
+
 	viewForm.Text.SetText(getTextFromFile(z.filePath))
 
 	quotation := getQuotationFromFile(z.filePath)
 	if len(quotation) > 0 {
 		sourceInfoForm.Quotation.SetText(quotation)
 	}
+
 	comment := getCommentFromFile(z.filePath)
 	if len(comment) > 0 {
 		commentForm.Comment.SetText(getCommentFromFile(z.filePath))
