@@ -55,7 +55,7 @@ func main() {
 
 	menu := fyne.NewMainMenu(
 		fyne.NewMenu("Файл",
-			fyne.NewMenuItem("Создать новую карточку", nil),
+			fyne.NewMenuItem("Создать новую карточку", nil), // +F2 и  кнопку на редактирование todo:
 			fyne.NewMenuItem("Изменить каталог", nil),
 			fyne.NewMenuItemSeparator(),
 			fyne.NewMenuItem("Список тегов", nil),

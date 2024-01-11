@@ -59,24 +59,27 @@ func (a *addInfoType) initForm() *fyne.Container {
 	a.Name.SetText("<Имя файла>")
 
 	a.Tags = widget.NewMultiLineEntry()
-	a.Tags.SetText("<#тег1>\n<#тег2>")
+	tagsBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, a.Tags)
+
 	a.Binds = widget.NewMultiLineEntry()
-	a.Binds.SetText("<Связное>")
+	dindsBox := container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, a.Binds)
+
 	a.Source = widget.NewMultiLineEntry()
-	a.Source.SetText("<Источники>")
-	box := container.NewGridWithColumns(1, a.Tags, a.Binds, a.Source)
+	sourceBox := container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, a.Source)
+
+	box := container.NewGridWithColumns(1, tagsBox, dindsBox, sourceBox)
 
 	return container.NewBorder(a.Name, nil, nil, nil, box)
 }
 
 func (s *sourceInfoType) initForm() *fyne.Container {
 	s.Source = newText()
-	s.Source.SetText("<Источник>")
+	sourceBox := container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, s.Source)
 
 	s.Quotation = newText()
-	s.Quotation.SetText("<Цитата>")
+	quotationBox := container.NewBorder(widget.NewLabel("Цитата:"), nil, nil, nil, s.Quotation)
 
-	return container.NewGridWithColumns(1, s.Source, s.Quotation) // todo: разделить
+	return container.NewGridWithColumns(1, sourceBox, quotationBox)
 }
 
 func (c *commentType) initForm() *fyne.Container {
