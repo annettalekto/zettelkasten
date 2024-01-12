@@ -13,7 +13,6 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -29,7 +28,7 @@ func main() {
 
 	a := app.New()
 	w := a.NewWindow(gProgramName)
-	w.Resize(fyne.NewSize(600, 400))
+	w.Resize(fyne.NewSize(600, 450))
 	w.CenterOnScreen()
 	w.SetMaster()
 
@@ -107,39 +106,39 @@ func mainForm() (box *fyne.Container) {
 		// 	statusLabel.Text = "Ошибка: рабочая папка не открыта"
 		fmt.Println("%v", err)
 	}
-	dirLabel := widget.NewLabel(gFilePath)
+	/*	dirLabel := widget.NewLabel(gFilePath)
 
-	dirButton := widget.NewButton("Каталог", func() {
-		dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
-			if r != nil && err == nil {
-				fmt.Println(r.URI())
-				gFilePath = filepath.Dir(r.URI().Path())
-				dirLabel.SetText(gFilePath)
-				files, _ = os.ReadDir(gFilePath)
-				list.Refresh()
-			}
-		},
-			fyne.CurrentApp().Driver().AllWindows()[0],
-		)
+		dirButton := widget.NewButton("Каталог", func() {
+			dialog := dialog.NewFileOpen(func(r fyne.URIReadCloser, err error) {
+				if r != nil && err == nil {
+					fmt.Println(r.URI())
+					gFilePath = filepath.Dir(r.URI().Path())
+					dirLabel.SetText(gFilePath)
+					files, _ = os.ReadDir(gFilePath)
+					list.Refresh()
+				}
+			},
+				fyne.CurrentApp().Driver().AllWindows()[0],
+			)
 
-		// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
-		// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
-		var dir fyne.ListableURI
-		d := storage.NewFileURI(gFilePath)
-		dir, _ = storage.ListerForURI(d)
+			// note: использовать если нужен выбор разных файлов + нужно считывать папку дополнительно
+			// dialog.SetFilter(storage.NewExtensionFileFilter([]string{".txt"}))
+			var dir fyne.ListableURI
+			d := storage.NewFileURI(gFilePath)
+			dir, _ = storage.ListerForURI(d)
 
-		dialog.SetLocation(dir)
-		dialog.SetConfirmText("Выбрать")
-		dialog.SetDismissText("Закрыть")
-		dialog.Show()
-	})
-	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
-	topBottom := container.NewVBox(dirBox)
+			dialog.SetLocation(dir)
+			dialog.SetConfirmText("Выбрать")
+			dialog.SetDismissText("Закрыть")
+			dialog.Show()
+		})
+		dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
+		topBottom := container.NewVBox(dirBox)*/
 
 	text := widget.NewMultiLineEntry() // todo: в отд ф
 	text.TextStyle.Monospace = true
 	text.Wrapping = fyne.TextWrapWord
-	text.SetText("text")
+	text.SetText("<Текст>")
 
 	/*openButton := widget.NewButton("Открыть", func() { // todo: заменить на редактирование
 		// text := getText(selectedFile.filePath)
@@ -156,7 +155,8 @@ func mainForm() (box *fyne.Container) {
 	})*/
 	te := widget.NewEntry()
 	te.TextStyle.Monospace = true // newFormatLabelAndEntry todo:
-	topicEntry := container.NewBorder(nil, nil, newFormatLabel("Topic:"), nil, te)
+	te.SetText("<Имя файл>")
+	topicEntry := container.NewBorder(nil, nil, nil, nil, te)
 
 	//btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
 	// bottom := container.NewVBox(topicEntry)
@@ -190,7 +190,7 @@ func mainForm() (box *fyne.Container) {
 		refreshTabs(selectedFile) // todo:  отладить вывод, подписи к формам
 	}
 
-	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)
+	panelBox := container.NewBorder(nil, nil, nil, nil, entryBox)
 	split := container.NewHSplit(list, panelBox)
 	box = container.NewBorder(nil, nil, nil, nil, split)
 
