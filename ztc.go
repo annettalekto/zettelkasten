@@ -136,31 +136,31 @@ func mainForm() (box *fyne.Container) {
 	dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
 	topBottom := container.NewVBox(dirBox)
 
-	text := widget.NewMultiLineEntry()
+	text := widget.NewMultiLineEntry() // todo: в отд ф
 	text.TextStyle.Monospace = true
 	text.Wrapping = fyne.TextWrapWord
 	text.SetText("text")
 
-	/*openButton := widget.NewButton("Открыть", func() {
+	/*openButton := widget.NewButton("Открыть", func() { // todo: заменить на редактирование
 		// text := getText(selectedFile.filePath)
 		// data, _ := fileRead(selectedFile.filePath)
 		// if data.filePath != "" {
 		// 	// textEditor(data, text)
 		// }
 	})
-	createButton := widget.NewButton("Создать", func() {
+	createButton := widget.NewButton("Создать", func() { // todo: надо
 		// var data fileType
 		// data.date = time.Now()
 		// data.filePath = filepath.Join(selectedDir, "new")
 		// textEditor(data, "")
 	})*/
-	topicEntry := widget.NewEntry()
-	topicEntry.TextStyle.Monospace = true
-	entr := container.NewBorder(nil, nil, newFormatLabel("Topic:"), nil, topicEntry)
+	te := widget.NewEntry()
+	te.TextStyle.Monospace = true // newFormatLabelAndEntry todo:
+	topicEntry := container.NewBorder(nil, nil, newFormatLabel("Topic:"), nil, te)
 
 	//btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
-	bottom := container.NewVBox(entr)
-	entryBox := container.NewBorder(nil, bottom, nil, nil, text)
+	// bottom := container.NewVBox(topicEntry)
+	entryBox := container.NewBorder(topicEntry, nil, nil, nil, text)
 
 	// список
 	list = widget.NewList(
@@ -184,10 +184,10 @@ func mainForm() (box *fyne.Container) {
 		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name()) // ???
 		selectedFile, err = fileRead(selectedFile.filePath)
 
-		topicEntry.SetText(selectedFile.title)
+		te.SetText(selectedFile.title)
 		text.SetText(getTextFromFile(selectedFile.filePath))
 
-		selectedFile.refreshTabs() // todo: c названиями что то не то // отладить вывод, подписи к формам
+		refreshTabs(selectedFile) // todo:  отладить вывод, подписи к формам
 	}
 
 	panelBox := container.NewBorder(topBottom, nil, nil, nil, entryBox)

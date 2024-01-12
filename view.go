@@ -90,7 +90,7 @@ func (c *commentType) initForm() *fyne.Container {
 	return container.NewGridWithColumns(1, c.Comment)
 }
 
-func (z *ztcBasicsType) refreshTabs() {
+func refreshTabs(z ztcBasicsType) {
 	viewForm.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
 	viewForm.Name.SetText(z.title)
 	viewForm.Text.SetText(getTextFromFile(z.filePath))
