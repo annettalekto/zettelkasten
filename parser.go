@@ -21,15 +21,6 @@ type ztcBasicsType struct {
 	// comment      string
 }
 
-// type fileType struct { // ztcElementsType ztcBasicsType
-// 	filePath     string // полное имя файла с путем и расширением файла
-// 	topic        string
-// 	tags         []string
-// 	links        []string
-// 	bindingFiles []string
-// 	date         time.Time
-// }
-
 var selectedFile ztcBasicsType
 
 func fileRead(filePath string) (ztc ztcBasicsType, err error) {
@@ -364,7 +355,7 @@ func textEditor(data fileType, text string) {
 		var d fileType
 
 		if fileNameEntry.Text == "" {
-			statusLabel.SetText("Введите имя файла") // todo: можно компактнее обрабатывать ощибки?
+			statusLabel.SetText("Введите имя файла") // можно компактнее обрабатывать ощибки?
 			return
 		}
 		if topicEntry.Text == "" {
@@ -428,7 +419,7 @@ func textEditor(data fileType, text string) {
 	})
 
 	notSaveButton := widget.NewButton("Закрыть без сохранения", func() {
-		// todo: задавать вопрос только если были изменения (bool в поле ввода?)
+		//задавать вопрос только если были изменения (bool в поле ввода?)
 		d := dialog.NewConfirm("Вопрос", "Точно не сохранять?", func(b bool) {
 			if b {
 				w.Close()

@@ -37,13 +37,11 @@ var commentForm commentType
 
 func (v *viewType) initForm() *fyne.Container {
 
-	// номер карты в шапке?
+	// todo: номер карты добавить
 	v.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
-	// d := container.NewBorder(nil, nil, nil, v.Date)
 
 	v.Name = newFormatEntry()
 	v.Name.SetText("<Имя файла>")
-	// top := container.NewVBox(d, v.Name)
 
 	v.Text = newText()
 	v.Text.SetText("<Текст>")

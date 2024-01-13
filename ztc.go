@@ -56,6 +56,7 @@ func main() {
 	menu := fyne.NewMainMenu(
 		fyne.NewMenu("Файл",
 			fyne.NewMenuItem("Создать новую карточку", nil), // +F2 и  кнопку на редактирование todo:
+			fyne.NewMenuItem("Редактировать файл", nil),
 			fyne.NewMenuItem("Изменить каталог", nil),
 			fyne.NewMenuItemSeparator(),
 			fyne.NewMenuItem("Список тегов", nil),
@@ -104,7 +105,7 @@ func mainForm() (box *fyne.Container) {
 	files, err := os.ReadDir(gFilePath)
 	if err != nil {
 		// 	statusLabel.Text = "Ошибка: рабочая папка не открыта"
-		fmt.Println("%v", err)
+		fmt.Println(err)
 	}
 	/*	dirLabel := widget.NewLabel(gFilePath)
 
