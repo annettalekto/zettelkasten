@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -16,10 +17,16 @@ func newFormatEntry() *widget.Entry {
 	return en
 }
 
-// todo: нужно?
 // func newFormatLabelAndEntry(name string) *fyne.Container {
 // 	return container.NewBorder(nil, nil, newFormatLabel(name), nil, newFormatEntry())
 // }
+
+func newText() *widget.Entry {
+	t := widget.NewMultiLineEntry()
+	t.TextStyle.Monospace = true
+	t.Wrapping = fyne.TextWrapWord
+	return t
+}
 
 func formatSlice(sl []string) (text string) {
 	for _, s := range sl {

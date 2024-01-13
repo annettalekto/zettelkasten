@@ -135,9 +135,7 @@ func mainForm() (box *fyne.Container) {
 		dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
 		topBottom := container.NewVBox(dirBox)*/
 
-	text := widget.NewMultiLineEntry() // todo: в отд ф
-	text.TextStyle.Monospace = true
-	text.Wrapping = fyne.TextWrapWord
+	text := newText()
 	text.SetText("<Текст>")
 
 	/*openButton := widget.NewButton("Открыть", func() { // todo: заменить на редактирование
@@ -154,7 +152,7 @@ func mainForm() (box *fyne.Container) {
 		// textEditor(data, "")
 	})*/
 	te := widget.NewEntry()
-	te.TextStyle.Monospace = true // newFormatLabelAndEntry todo:
+	te.TextStyle.Monospace = true
 	te.SetText("<Имя файл>")
 	topicEntry := container.NewBorder(nil, nil, nil, nil, te)
 
@@ -187,7 +185,7 @@ func mainForm() (box *fyne.Container) {
 		te.SetText(selectedFile.title)
 		text.SetText(getTextFromFile(selectedFile.filePath))
 
-		refreshTabs(selectedFile) // todo:  отладить вывод, подписи к формам
+		refreshTabs(selectedFile)
 	}
 
 	panelBox := container.NewBorder(nil, nil, nil, nil, entryBox)

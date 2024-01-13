@@ -14,7 +14,26 @@ type viewType struct {
 	Name *widget.Entry
 }
 
+type addInfoType struct {
+	Name   *widget.Entry
+	Tags   *widget.Entry
+	Binds  *widget.Entry
+	Source *widget.Entry
+}
+
+type sourceInfoType struct {
+	Source    *widget.Entry
+	Quotation *widget.Entry
+}
+
+type commentType struct {
+	Comment *widget.Entry
+}
+
+var addInfoForm addInfoType
 var viewForm viewType
+var sourceInfoForm sourceInfoType
+var commentForm commentType
 
 func (v *viewType) initForm() *fyne.Container {
 
@@ -26,9 +45,7 @@ func (v *viewType) initForm() *fyne.Container {
 	v.Name.SetText("<Имя файла>")
 	// top := container.NewVBox(d, v.Name)
 
-	v.Text = widget.NewMultiLineEntry()
-	v.Text.TextStyle.Monospace = true
-	v.Text.Wrapping = fyne.TextWrapWord
+	v.Text = newText()
 	v.Text.SetText("<Текст>")
 
 	bottom := container.NewBorder(nil, nil, v.Date, widget.NewButton("Редакт.", nil))
@@ -36,56 +53,34 @@ func (v *viewType) initForm() *fyne.Container {
 	return container.NewBorder(v.Name, bottom, nil, nil, v.Text)
 }
 
-type addInfoType struct {
-	Name   *widget.Entry
-	Tegs   *widget.Entry
-	Binds  *widget.Entry
-	Source *widget.Entry
-}
-
-var addInfoForm addInfoType
-
 func (a *addInfoType) initForm() *fyne.Container {
 
 	a.Name = newFormatEntry()
 	a.Name.SetText("<Имя файла>")
 
-	a.Tegs = widget.NewMultiLineEntry()
-	a.Tegs.SetText("<#тег1>\n<#тег2>")
+	a.Tags = widget.NewMultiLineEntry()
+	a.Tags.SetText("<#тег1>\n<#тег2>")
 	a.Binds = widget.NewMultiLineEntry()
 	a.Binds.SetText("<Связное>")
 	a.Source = widget.NewMultiLineEntry()
 	a.Source.SetText("<Источники>")
-	box := container.NewGridWithColumns(1, a.Tegs, a.Binds, a.Source)
+	box := container.NewGridWithColumns(1, a.Tags, a.Binds, a.Source)
 
 	return container.NewBorder(a.Name, nil, nil, nil, box)
 }
 
-type sourceInfoType struct {
-	Source    *widget.Entry
-	Quotation *widget.Entry
-}
-
-var sourceInfoForm sourceInfoType
-
 func (s *sourceInfoType) initForm() *fyne.Container {
-	s.Source = widget.NewMultiLineEntry()
+	s.Source = newText()
 	s.Source.SetText("<Источник>")
 
-	s.Quotation = widget.NewMultiLineEntry()
+	s.Quotation = newText()
 	s.Quotation.SetText("<Цитата>")
 
 	return container.NewGridWithColumns(1, s.Source, s.Quotation) // todo: разделить
 }
 
-type commentType struct {
-	Comment *widget.Entry
-}
-
-var commentForm commentType
-
 func (c *commentType) initForm() *fyne.Container {
-	c.Comment = widget.NewMultiLineEntry()
+	c.Comment = newText()
 	c.Comment.SetText("<Комментарий>")
 
 	return container.NewGridWithColumns(1, c.Comment)
@@ -100,7 +95,7 @@ func refreshTabs(z ztcBasicsType) {
 	}
 
 	if len(z.tags) > 0 {
-		addInfoForm.Tegs.SetText(formatSlice(z.tags))
+		addInfoForm.Tags.SetText(formatSlice(z.tags))
 	}
 
 	if len(z.bind) > 0 {
