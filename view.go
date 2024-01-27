@@ -8,17 +8,17 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-type viewType struct {
-	Text *widget.Entry
-	Date *widget.Label
-	Name *widget.Entry
-}
-
 type addInfoType struct {
 	Name   *widget.Entry
 	Tags   *widget.Entry
 	Binds  *widget.Entry
 	Source *widget.Entry
+}
+
+type viewType struct {
+	Text *widget.Entry
+	Date *widget.Label
+	Name *widget.Entry
 }
 
 type sourceInfoType struct {
@@ -46,7 +46,12 @@ func (v *viewType) initForm() *fyne.Container {
 	v.Text = newText()
 	v.Text.SetText("<Текст>")
 
-	bottom := container.NewBorder(nil, nil, v.Date, widget.NewButton("Редакт.", nil))
+	btnEdit := widget.NewButton("Редакт.", func() {
+		// вызвать окно редактора todo:
+		editForm()
+	})
+
+	bottom := container.NewBorder(nil, nil, v.Date, btnEdit)
 
 	return container.NewBorder(v.Name, bottom, nil, nil, v.Text)
 }
@@ -119,4 +124,20 @@ func refreshTabs(z ztcBasicsType) {
 	if len(comment) > 0 {
 		commentForm.Comment.SetText(getCommentFromFile(z.filePath))
 	}
+}
+
+func editForm() {
+	w := fyne.CurrentApp().NewWindow("0")
+	w.Resize(fyne.NewSize(800, 600))
+	w.CenterOnScreen()
+
+	// 	var addInfoForm addInfoType
+	// var viewForm viewType
+	// var sourceInfoForm sourceInfoType
+	// var commentForm commentType
+	box := container.NewVBox(addInfoForm.Name, addInfoForm.Tags, addInfoForm.Source)
+
+	w.SetContent(box)
+
+	w.Show()
 }
