@@ -86,10 +86,10 @@ func main() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("список", mainForm()),
-		container.NewTabItem("просмотр", viewForm.initForm()),
-		container.NewTabItem("доп.", addInfoForm.initForm()),
-		container.NewTabItem("источник", sourceInfoForm.initForm()),
-		container.NewTabItem("коммент.", commentForm.initForm()),
+		container.NewTabItem("просмотр", elmForm.viewForm()),
+		container.NewTabItem("доп.", elmForm.addInfoForm()),
+		container.NewTabItem("источник", elmForm.sourceForm()),
+		container.NewTabItem("коммент.", elmForm.commentForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
 	w.SetContent(tabs)
@@ -186,7 +186,7 @@ func mainForm() (box *fyne.Container) {
 		te.SetText(selectedFile.title)
 		text.SetText(getTextFromFile(selectedFile.filePath))
 
-		refreshTabs(selectedFile)
+		elmForm.refreshTabs(selectedFile)
 	}
 
 	panelBox := container.NewBorder(nil, nil, nil, nil, entryBox)
