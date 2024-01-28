@@ -19,34 +19,7 @@ type elmFormType struct {
 	Comment   *widget.Entry
 }
 
-// type addInfoType struct {
-// 	Name   *widget.Entry
-// 	Tags   *widget.Entry
-// 	Binds  *widget.Entry
-// 	Source *widget.Entry
-// }
-
-// type viewType struct {
-// 	Text *widget.Entry
-// 	Date *widget.Label
-// 	Name *widget.Entry
-// }
-
-// type sourceInfoType struct {
-// 	Source    *widget.Entry
-// 	Quotation *widget.Entry
-// }
-
-// type commentType struct {
-// 	Comment *widget.Entry
-// }
-
 var elmForm elmFormType
-
-// var addInfoForm addInfoType
-// var viewForm viewType
-// var sourceInfoForm sourceInfoType
-// var commentForm commentType
 
 func (e *elmFormType) addInfoForm() *fyne.Container {
 
@@ -61,7 +34,7 @@ func (e *elmFormType) addInfoForm() *fyne.Container {
 
 	btnEdit := widget.NewButton("Редакт.", func() {
 		// вызвать окно редактора todo:
-		// editForm()
+		e.editForm()
 	})
 
 	bottom := container.NewBorder(nil, nil, e.Date, btnEdit)
@@ -75,7 +48,7 @@ func (e *elmFormType) viewForm() *fyne.Container {
 	e.Name.SetText("<Имя файла>")
 
 	e.Tags = widget.NewMultiLineEntry()
-	tagBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, widget.NewMultiLineEntry())
+	tagBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags)
 
 	e.Binds = widget.NewMultiLineEntry()
 	dindsBox := container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)
@@ -110,7 +83,6 @@ func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 	e.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
 	if len(z.title) > 1 {
 		e.Name.SetText(z.title)
-		e.Name.SetText(z.title)
 	}
 
 	if len(z.tags) > 0 {
@@ -122,7 +94,6 @@ func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 	}
 
 	if len(z.source) > 0 {
-		e.Source.SetText(formatSlice(z.source))
 		e.Source.SetText(formatSlice(z.source))
 	}
 
@@ -139,24 +110,21 @@ func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 	}
 }
 
-/*
-func editForm() {
+func (e *elmFormType) editForm() { // открывать только для текущего файла
 	w := fyne.CurrentApp().NewWindow("0")
 	w.Resize(fyne.NewSize(800, 600))
 	w.CenterOnScreen()
+	// todo: оформить по типу шаблонного файла
+	tagBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags)
+	dindsBox := container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)
+	// номер и название источников отдельно? как удобнее считывать и составлять итоговый файл
+	sourceBox := container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source)
+	quotationBox := container.NewBorder(widget.NewLabel("Цитата:"), nil, nil, nil, e.Quotation)
+	commentBox := container.NewBorder(widget.NewLabel("Комментарий:"), nil, nil, nil, e.Comment)
 
-	// 	var addInfoForm addInfoType
-	// var viewForm viewType
-	// var sourceInfoForm sourceInfoType
-	// var commentForm commentType
-
-	addInfoForm.Tags
-	addInfoForm.Source
-	b := container.NewGridWithColumns(1, container.NewHBox(widget.NewLabel("Теги:"), addInfoForm.Tags)
-
-	box := container.NewBorder(addInfoForm.Name, nil, nil, nil)
-
+	b := container.NewGridWithColumns(1, tagBox, dindsBox, sourceBox, quotationBox, commentBox)
+	box := container.NewBorder(e.Name, nil, nil, nil, b) // + текст
 	w.SetContent(box)
 
 	w.Show()
-}*/
+}
