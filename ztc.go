@@ -84,16 +84,35 @@ func main() {
 		}
 	}()
 
+	// tabs := container.NewAppTabs(
+	// 	// container.NewTabItem("список", mainForm()),
+	// 	container.NewTabItem("просмотр", elmForm.viewForm()),
+	// 	container.NewTabItem("доп.", elmForm.addInfoForm()),
+	// 	container.NewTabItem("источник", elmForm.sourceForm()),
+	// 	container.NewTabItem("коммент.", elmForm.commentForm()),
+	// )
+	// tabs.SetTabLocation(container.TabLocationBottom)
+
+	w.SetContent(mainForm())
+	w.ShowAndRun()
+}
+
+func ViewCard() {
+	w := fyne.CurrentApp().NewWindow(selectedFile.id)
+	w.Resize(fyne.NewSize(400, 300))
+	w.CenterOnScreen()
+
 	tabs := container.NewAppTabs(
-		container.NewTabItem("список", mainForm()),
+		// container.NewTabItem("список", mainForm()),
 		container.NewTabItem("просмотр", elmForm.viewForm()),
 		container.NewTabItem("доп.", elmForm.addInfoForm()),
 		container.NewTabItem("источник", elmForm.sourceForm()),
 		container.NewTabItem("коммент.", elmForm.commentForm()),
 	)
+
 	tabs.SetTabLocation(container.TabLocationBottom)
 	w.SetContent(tabs)
-	w.ShowAndRun()
+	w.Show()
 }
 
 func mainForm() (box *fyne.Container) {
@@ -136,30 +155,8 @@ func mainForm() (box *fyne.Container) {
 		dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
 		topBottom := container.NewVBox(dirBox)*/
 
-	text := newText()
-	text.SetText("<Текст>")
-
-	/*openButton := widget.NewButton("Открыть", func() { // todo: заменить на редактирование
-		// text := getText(selectedFile.filePath)
-		// data, _ := fileRead(selectedFile.filePath)
-		// if data.filePath != "" {
-		// 	// textEditor(data, text)
-		// }
-	})
-	createButton := widget.NewButton("Создать", func() { // todo: надо
-		// var data fileType
-		// data.date = time.Now()
-		// data.filePath = filepath.Join(selectedDir, "new")
-		// textEditor(data, "")
-	})*/
-	te := widget.NewEntry()
-	te.TextStyle.Monospace = true
-	te.SetText("<Имя файл>")
-	topicEntry := container.NewBorder(nil, nil, nil, nil, te)
-
 	//btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
 	// bottom := container.NewVBox(topicEntry)
-	entryBox := container.NewBorder(topicEntry, nil, nil, nil, text)
 
 	// список
 	list = widget.NewList(
@@ -182,15 +179,12 @@ func mainForm() (box *fyne.Container) {
 
 		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name()) // ???
 		selectedFile, err = fileRead(selectedFile.filePath)
-
-		te.SetText(selectedFile.title)
-		text.SetText(getTextFromFile(selectedFile.filePath))
+		ViewCard()
 
 		elmForm.refreshTabs(selectedFile)
 	}
 
-	panelBox := container.NewBorder(nil, nil, nil, nil, entryBox)
-	split := container.NewHSplit(list, panelBox)
+	split := container.NewHSplit(list, widget.NewLabel("зарезервировано"))
 	box = container.NewBorder(nil, nil, nil, nil, split)
 
 	return
