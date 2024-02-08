@@ -84,26 +84,16 @@ func main() {
 		}
 	}()
 
-	// tabs := container.NewAppTabs(
-	// 	// container.NewTabItem("список", mainForm()),
-	// 	container.NewTabItem("просмотр", elmForm.viewForm()),
-	// 	container.NewTabItem("доп.", elmForm.addInfoForm()),
-	// 	container.NewTabItem("источник", elmForm.sourceForm()),
-	// 	container.NewTabItem("коммент.", elmForm.commentForm()),
-	// )
-	// tabs.SetTabLocation(container.TabLocationBottom)
-
 	w.SetContent(mainForm())
 	w.ShowAndRun()
 }
 
 func ViewCard() {
 	w := fyne.CurrentApp().NewWindow(selectedFile.id)
-	w.Resize(fyne.NewSize(400, 300))
+	w.Resize(fyne.NewSize(400, 400))
 	w.CenterOnScreen()
 
 	tabs := container.NewAppTabs(
-		// container.NewTabItem("список", mainForm()),
 		container.NewTabItem("просмотр", elmForm.viewForm()),
 		container.NewTabItem("доп.", elmForm.addInfoForm()),
 		container.NewTabItem("источник", elmForm.sourceForm()),
@@ -118,7 +108,6 @@ func ViewCard() {
 func mainForm() (box *fyne.Container) {
 
 	var list *widget.List
-	// statusLabel := widget.NewLabel(" ")
 	gFilePath = "D:\\ztc test"
 
 	files, err := os.ReadDir(gFilePath)
@@ -154,9 +143,6 @@ func mainForm() (box *fyne.Container) {
 		})
 		dirBox := container.NewBorder(nil, nil, dirLabel, dirButton)
 		topBottom := container.NewVBox(dirBox)*/
-
-	//btn := container.NewHBox(createButton, layout.NewSpacer(), openButton)
-	// bottom := container.NewVBox(topicEntry)
 
 	// список
 	list = widget.NewList(

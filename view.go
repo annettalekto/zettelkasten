@@ -26,14 +26,9 @@ func (e *elmFormType) viewForm() *fyne.Container {
 	e.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
 
 	e.Name = newFormatEntry()
-	// e.Name.SetText("<Имя файла>")
 
 	e.Text = newText()
 	e.Text.SetText("<Текст>")
-
-	// btnEdit := widget.NewButton("Редакт.", func() {
-	// 	e.editForm()
-	// })
 
 	bottom := container.NewBorder(nil, nil, e.Date, nil)
 
@@ -42,17 +37,11 @@ func (e *elmFormType) viewForm() *fyne.Container {
 
 func (e *elmFormType) addInfoForm() *fyne.Container {
 
-	//e.Name = newFormatEntry()
-	// e.Name.SetText("<Имя файла>")
-
 	e.Tags = widget.NewMultiLineEntry()
 	tagBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags)
 
 	e.Binds = widget.NewMultiLineEntry()
 	dindsBox := container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)
-
-	// e.Source = widget.NewMultiLineEntry()
-	// sourceBox := container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source)
 
 	box := container.NewGridWithColumns(1, tagBox, dindsBox)
 
@@ -78,34 +67,14 @@ func (e *elmFormType) commentForm() *fyne.Container {
 
 func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 
-	e.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04"))) //d.Format("2006-01-02 15:04")
-	// if len(z.title) > 1 {
+	e.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04")))
 	e.Name.SetText(z.title)
-	// }
-
-	// if len(z.tags) > 0 {
 	e.Tags.SetText(formatSlice(z.tags))
-	// }
-
-	// if len(z.bind) > 0 {
 	e.Binds.SetText(formatSlice(z.bind))
-	// }
-
-	// if len(z.source) > 0 {
 	e.Source.SetText(formatSlice(z.source))
-	// }
-
 	e.Text.SetText(getTextFromFile(z.filePath))
-
-	quotation := getQuotationFromFile(z.filePath)
-	// if len(quotation) > 0 {
-	e.Quotation.SetText(quotation)
-	// }
-
-	// comment := getCommentFromFile(z.filePath)
-	// if len(comment) > 0 {
+	e.Quotation.SetText(getQuotationFromFile(z.filePath))
 	e.Comment.SetText(getCommentFromFile(z.filePath))
-	// }
 }
 
 /*

@@ -9,10 +9,10 @@ import (
 
 type ztcBasicsType struct {
 	filePath     string
-	id           string // todo: а зачем переводить в числа?
+	id           string
 	title        string
 	tags         []string
-	sourceNumber []string // может ли быть несколько источников?
+	sourceNumber []string
 	source       []string
 	bindNumbers  []string
 	bind         []string
