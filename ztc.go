@@ -88,6 +88,25 @@ func main() {
 	w.ShowAndRun()
 }
 
+func CreateNewCard() {
+	// var newFile ztcBasicsType
+
+	w := fyne.CurrentApp().NewWindow(selectedFile.id)
+	w.Resize(fyne.NewSize(400, 400))
+	w.CenterOnScreen()
+
+	numberEntry := widget.NewEntry()
+	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер:      "), nil, numberEntry)
+	nameEntry := widget.NewEntry()
+	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, nameEntry)
+	okBtn := widget.NewButton("Ок", func() {})
+
+	box := container.NewVBox(ent1, ent2, okBtn)
+	w.SetContent(box)
+
+	w.Show()
+}
+
 func ViewCard() {
 	w := fyne.CurrentApp().NewWindow(selectedFile.id)
 	w.Resize(fyne.NewSize(400, 400))
@@ -99,8 +118,8 @@ func ViewCard() {
 		container.NewTabItem("источник", elmForm.sourceForm()),
 		container.NewTabItem("коммент.", elmForm.commentForm()),
 	)
-
 	tabs.SetTabLocation(container.TabLocationBottom)
+
 	w.SetContent(tabs)
 	w.Show()
 }
@@ -170,7 +189,11 @@ func mainForm() (box *fyne.Container) {
 		elmForm.refreshTabs(selectedFile)
 	}
 
-	split := container.NewHSplit(list, widget.NewLabel("зарезервировано"))
+	btnCreate := widget.NewButton("Создать", func() {
+		CreateNewCard()
+	})
+	btns := container.NewVBox(btnCreate)
+	split := container.NewHSplit(list, btns)
 	box = container.NewBorder(nil, nil, nil, nil, split)
 
 	return
