@@ -9,7 +9,9 @@ import (
 )
 
 type elmFormType struct {
-	Name      *widget.Entry
+	id        *widget.Entry
+	NameCard  *widget.Entry
+	Title     *widget.Entry // name ot title todo:
 	Tags      *widget.Entry
 	Binds     *widget.Entry
 	Source    *widget.Entry
@@ -21,18 +23,32 @@ type elmFormType struct {
 
 var elmForm elmFormType
 
-func (e *elmFormType) viewForm() *fyne.Container {
+func (e *elmFormType) getNameCard() *fyne.Container { // todo: file -> card everywhere
+
+	e.id = widget.NewEntry()
+	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер:      "), nil, e.id)
+	e.NameCard = widget.NewEntry()
+	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, e.NameCard)
+	okBtn := widget.NewButton("Ок", func() {
+		// todo: вызвать сбор всех инфы
+	})
+
+	return container.NewVBox(ent1, ent2, okBtn)
+
+}
+
+func (e *elmFormType) viewForm() *fyne.Container { // todo: rename
 
 	e.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
 
-	e.Name = newFormatEntry()
+	e.Title = newFormatEntry()
 
 	e.Text = newText()
 	e.Text.SetText("<Текст>")
 
 	bottom := container.NewBorder(nil, nil, e.Date, nil)
 
-	return container.NewBorder(e.Name, bottom, nil, nil, e.Text)
+	return container.NewBorder(e.Title, bottom, nil, nil, e.Text)
 }
 
 func (e *elmFormType) addInfoForm() *fyne.Container {
@@ -68,7 +84,7 @@ func (e *elmFormType) commentForm() *fyne.Container {
 func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 
 	e.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04")))
-	e.Name.SetText(z.title)
+	e.Title.SetText(z.title)
 	e.Tags.SetText(formatSlice(z.tags))
 	e.Binds.SetText(formatSlice(z.bind))
 	e.Source.SetText(formatSlice(z.source))

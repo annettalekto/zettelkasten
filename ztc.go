@@ -92,17 +92,19 @@ func CreateNewCard() {
 	// var newFile ztcBasicsType
 
 	w := fyne.CurrentApp().NewWindow(selectedFile.id)
-	w.Resize(fyne.NewSize(400, 400))
+	w.Resize(fyne.NewSize(500, 400))
 	w.CenterOnScreen()
 
-	numberEntry := widget.NewEntry()
-	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер:      "), nil, numberEntry)
-	nameEntry := widget.NewEntry()
-	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, nameEntry)
-	okBtn := widget.NewButton("Ок", func() {})
+	tabs := container.NewAppTabs(
+		container.NewTabItem("создание", elmForm.getNameCard()),
+		container.NewTabItem("просмотр", elmForm.viewForm()), // todo: не просмотр - текст форм?
+		container.NewTabItem("доп.", elmForm.addInfoForm()),
+		container.NewTabItem("источник", elmForm.sourceForm()),
+		container.NewTabItem("коммент.", elmForm.commentForm()),
+	)
+	tabs.SetTabLocation(container.TabLocationBottom)
 
-	box := container.NewVBox(ent1, ent2, okBtn)
-	w.SetContent(box)
+	w.SetContent(tabs)
 
 	w.Show()
 }
@@ -182,7 +184,7 @@ func mainForm() (box *fyne.Container) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name()) // ???
+		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name())
 		selectedFile, err = fileRead(selectedFile.filePath)
 		ViewCard()
 
