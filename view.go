@@ -10,8 +10,8 @@ import (
 
 type elmFormType struct {
 	id        *widget.Entry
-	NameCard  *widget.Entry
-	Title     *widget.Entry // name ot title todo:
+	FilePath  *widget.Entry
+	Title     *widget.Entry
 	Tags      *widget.Entry
 	Binds     *widget.Entry
 	Source    *widget.Entry
@@ -23,13 +23,14 @@ type elmFormType struct {
 
 var elmForm elmFormType
 
-func (e *elmFormType) getNameCard() *fyne.Container { // todo: file -> card everywhere
+func (e *elmFormType) getNameCard() *fyne.Container {
 
 	e.id = widget.NewEntry()
 	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер:      "), nil, e.id)
-	e.NameCard = widget.NewEntry()
-	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, e.NameCard)
-	okBtn := widget.NewButton("Ок", func() {
+	e.FilePath = widget.NewEntry()
+	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, e.FilePath)
+	// + дополнительно в лейбл вывести полный путь с полным названием (путь + номер + титл)
+	okBtn := widget.NewButton("Создать карточку", func() {
 		// todo: вызвать сбор всех инфы
 	})
 
@@ -37,48 +38,46 @@ func (e *elmFormType) getNameCard() *fyne.Container { // todo: file -> card ever
 
 }
 
-func (e *elmFormType) viewForm() *fyne.Container { // todo: rename
+func (e *elmFormType) textForm() *fyne.Container {
 
 	e.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
-
 	e.Title = newFormatEntry()
-
 	e.Text = newText()
 	e.Text.SetText("<Текст>")
 
-	bottom := container.NewBorder(nil, nil, e.Date, nil)
-
-	return container.NewBorder(e.Title, bottom, nil, nil, e.Text)
+	return container.NewBorder(
+		e.Title,
+		container.NewBorder(nil, nil, e.Date, nil),
+		nil,
+		nil,
+		e.Text)
 }
 
 func (e *elmFormType) addInfoForm() *fyne.Container {
 
 	e.Tags = widget.NewMultiLineEntry()
-	tagBox := container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags)
-
 	e.Binds = widget.NewMultiLineEntry()
-	dindsBox := container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)
 
-	box := container.NewGridWithColumns(1, tagBox, dindsBox)
-
-	return container.NewBorder(nil, nil, nil, nil, box)
+	return container.NewBorder(nil, nil, nil, nil,
+		container.NewGridWithColumns(1,
+			container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags),
+			container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)))
 }
 
 func (e *elmFormType) sourceForm() *fyne.Container {
 	e.Source = newText()
-	sourceBox := container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source)
-
 	e.Quotation = newText()
-	quotationBox := container.NewBorder(widget.NewLabel("Цитата:"), nil, nil, nil, e.Quotation)
 
-	return container.NewGridWithColumns(1, sourceBox, quotationBox)
+	return container.NewGridWithColumns(1,
+		container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source),
+		container.NewBorder(widget.NewLabel("Цитата:"), nil, nil, nil, e.Quotation))
 }
 
 func (e *elmFormType) commentForm() *fyne.Container {
 	e.Comment = newText()
-	commentBox := container.NewBorder(widget.NewLabel("Комментарий:"), nil, nil, nil, e.Comment)
 
-	return container.NewGridWithColumns(1, commentBox)
+	return container.NewGridWithColumns(1,
+		container.NewBorder(widget.NewLabel("Комментарий:"), nil, nil, nil, e.Comment))
 }
 
 func (e *elmFormType) refreshTabs(z ztcBasicsType) {

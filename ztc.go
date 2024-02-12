@@ -67,7 +67,6 @@ func main() {
 			fyne.NewMenuItem("Тема", func() { changeTheme(a) }),
 			fyne.NewMenuItem("Сортировка", nil),
 		),
-
 		fyne.NewMenu("Справка",
 			fyne.NewMenuItem("Посмотреть справку", func() { aboutHelp() }),
 			fyne.NewMenuItem("О программе", func() { aboutProgram() }),
@@ -97,7 +96,7 @@ func CreateNewCard() {
 
 	tabs := container.NewAppTabs(
 		container.NewTabItem("создание", elmForm.getNameCard()),
-		container.NewTabItem("просмотр", elmForm.viewForm()), // todo: не просмотр - текст форм?
+		container.NewTabItem("текст", elmForm.textForm()), // todo: не просмотр - текст форм?
 		container.NewTabItem("доп.", elmForm.addInfoForm()),
 		container.NewTabItem("источник", elmForm.sourceForm()),
 		container.NewTabItem("коммент.", elmForm.commentForm()),
@@ -115,7 +114,7 @@ func ViewCard() {
 	w.CenterOnScreen()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("просмотр", elmForm.viewForm()),
+		container.NewTabItem("просмотр", elmForm.textForm()),
 		container.NewTabItem("доп.", elmForm.addInfoForm()),
 		container.NewTabItem("источник", elmForm.sourceForm()),
 		container.NewTabItem("коммент.", elmForm.commentForm()),
