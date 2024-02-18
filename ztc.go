@@ -95,8 +95,8 @@ func CreateNewCard() {
 	w.CenterOnScreen()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("создание", elmForm.getNameCard()),
-		container.NewTabItem("текст", elmForm.textForm()), // todo: не просмотр - текст форм?
+		container.NewTabItem("создание", elmForm.nameCardForm()),
+		container.NewTabItem("текст", elmForm.textForm()), // todo: дату нужно заполнить
 		container.NewTabItem("доп.", elmForm.addInfoForm()),
 		container.NewTabItem("источник", elmForm.sourceForm()),
 		container.NewTabItem("коммент.", elmForm.commentForm()),
@@ -183,8 +183,7 @@ func mainForm() (box *fyne.Container) {
 
 	list.OnSelected = func(id widget.ListItemID) {
 
-		selectedFile.filePath = filepath.Join(gFilePath, files[id].Name())
-		selectedFile, err = fileRead(selectedFile.filePath)
+		selectedFile.fileRead(filepath.Join(gFilePath, files[id].Name()))
 		ViewCard()
 
 		elmForm.refreshTabs(selectedFile)

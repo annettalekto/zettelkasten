@@ -23,7 +23,7 @@ type ztcBasicsType struct {
 
 var selectedFile ztcBasicsType
 
-func fileRead(filePath string) (ztc ztcBasicsType, err error) {
+func (ztc *ztcBasicsType) fileRead(filePath string) {
 
 	ztc.filePath = filePath
 	ztc.title = getTopicFromFile(filePath)
@@ -32,10 +32,8 @@ func fileRead(filePath string) (ztc ztcBasicsType, err error) {
 	ztc.sourceNumber, ztc.source = getSourceFromFile(filePath)
 	ztc.bindNumbers, ztc.bind = getBindFromFile(filePath)
 	ztc.data = getDataFromFile(filePath)
-	// ztc.quotation = getQuotationFromFile(filePath)
-	// ztc.comment = getCommentFromFile(filePath)
-
-	return
+	// ztc.quotation = getQuotationFromFile(fpath)
+	// ztc.comment = getCommentFromFile(fpath)
 }
 
 func getTopicFromFile(filePath string) (s string) {

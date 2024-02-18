@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -9,7 +10,7 @@ import (
 )
 
 type elmFormType struct {
-	id        *widget.Entry
+	id        *numericalEntry
 	FilePath  *widget.Entry
 	Title     *widget.Entry
 	Tags      *widget.Entry
@@ -23,19 +24,39 @@ type elmFormType struct {
 
 var elmForm elmFormType
 
-func (e *elmFormType) getNameCard() *fyne.Container {
+func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 
-	e.id = widget.NewEntry()
-	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер:      "), nil, e.id)
+	ztc.id = e.id.Text
+	// ztc.filePath =  // todo (путь + номер + титл)
+	ztc.title = e.Title.Text
+	ztc.tags = strings.Split(e.Tags.Text, "\n") // clear
+	ztc.bind = strings.Split(e.Binds.Text, "\n")
+	// ztc.bindNumbers
+	ztc.source = strings.Split(e.Source.Text, "\n")
+	// ztc.sourceNumber
+
+	// ztc.data
+
+	// quotation
+	// comment
+
+	return ztc
+}
+
+func (e *elmFormType) nameCardForm() *fyne.Container {
+
+	e.id = newNumericalEntry() //widget.NewEntry()
+	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карт.:"), nil, e.id)
 	e.FilePath = widget.NewEntry()
-	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, e.FilePath)
+	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Имя файла:    "), nil, e.FilePath)
 	// + дополнительно в лейбл вывести полный путь с полным названием (путь + номер + титл)
 	okBtn := widget.NewButton("Создать карточку", func() {
 		// todo: вызвать сбор всех инфы
+		ztc := e.getDataNewCard() // todo: отладить
+		fmt.Println(ztc.tags)
 	})
 
 	return container.NewVBox(ent1, ent2, okBtn)
-
 }
 
 func (e *elmFormType) textForm() *fyne.Container {
