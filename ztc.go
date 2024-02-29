@@ -88,23 +88,22 @@ func main() {
 }
 
 func CreateNewCard() {
-	// var newFile ztcBasicsType
 
-	w := fyne.CurrentApp().NewWindow(selectedFile.id)
+	w := fyne.CurrentApp().NewWindow("Новая карточка")
 	w.Resize(fyne.NewSize(500, 400))
 	w.CenterOnScreen()
 
+	var new elmFormType
 	tabs := container.NewAppTabs(
-		container.NewTabItem("создание", elmForm.nameCardForm()),
-		container.NewTabItem("текст", elmForm.textForm()), // todo: дату нужно заполнить
-		container.NewTabItem("доп.", elmForm.addInfoForm()),
-		container.NewTabItem("источник", elmForm.sourceForm()),
-		container.NewTabItem("коммент.", elmForm.commentForm()),
+		container.NewTabItem("создание", new.nameCardForm()),
+		container.NewTabItem("текст", new.textForm()), // todo: дату нужно заполнить
+		container.NewTabItem("доп.", new.addInfoForm()),
+		container.NewTabItem("источник", new.sourceForm()),
+		container.NewTabItem("коммент.", new.commentForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
 
 	w.SetContent(tabs)
-
 	w.Show()
 }
 
@@ -114,10 +113,10 @@ func ViewCard() {
 	w.CenterOnScreen()
 
 	tabs := container.NewAppTabs(
-		container.NewTabItem("просмотр", elmForm.textForm()),
-		container.NewTabItem("доп.", elmForm.addInfoForm()),
-		container.NewTabItem("источник", elmForm.sourceForm()),
-		container.NewTabItem("коммент.", elmForm.commentForm()),
+		container.NewTabItem("текст", view.textForm()),
+		container.NewTabItem("доп.", view.addInfoForm()),
+		container.NewTabItem("источник", view.sourceForm()),
+		container.NewTabItem("коммент.", view.commentForm()),
 	)
 	tabs.SetTabLocation(container.TabLocationBottom)
 
@@ -186,7 +185,7 @@ func mainForm() (box *fyne.Container) {
 		selectedFile.fileRead(filepath.Join(gFilePath, files[id].Name()))
 		ViewCard()
 
-		elmForm.refreshTabs(selectedFile)
+		view.refreshTabs(selectedFile)
 	}
 
 	btnCreate := widget.NewButton("Создать", func() {

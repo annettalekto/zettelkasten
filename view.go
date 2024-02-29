@@ -22,7 +22,7 @@ type elmFormType struct {
 	Comment   *widget.Entry
 }
 
-var elmForm elmFormType
+var view elmFormType
 
 func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 
@@ -45,7 +45,7 @@ func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 
 func (e *elmFormType) nameCardForm() *fyne.Container {
 
-	e.id = newNumericalEntry() //widget.NewEntry()
+	e.id = newNumericalEntry()
 	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карт.:"), nil, e.id)
 	e.FilePath = widget.NewEntry()
 	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Имя файла:    "), nil, e.FilePath)
@@ -64,7 +64,7 @@ func (e *elmFormType) textForm() *fyne.Container {
 	e.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
 	e.Title = newFormatEntry()
 	e.Text = newText()
-	e.Text.SetText("<Текст>")
+	// e.Text.SetText("<Текст>")
 
 	return container.NewBorder(
 		e.Title,
