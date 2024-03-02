@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -10,16 +11,18 @@ import (
 )
 
 type elmFormType struct {
-	id        *numericalEntry
-	FilePath  *widget.Entry
-	Title     *widget.Entry
-	Tags      *widget.Entry
-	Binds     *widget.Entry
-	Source    *widget.Entry
-	Text      *widget.Entry
-	Date      *widget.Label
-	Quotation *widget.Entry
-	Comment   *widget.Entry
+	id           *numericalEntry
+	FilePath     *widget.Entry
+	Title        *widget.Entry
+	Tags         *widget.Entry
+	BindNumbers  *numericalEntry
+	Binds        *widget.Entry
+	SourceNumber *numericalEntry
+	Source       *widget.Entry
+	Text         *widget.Entry
+	Date         *widget.Label
+	Quotation    *widget.Entry
+	Comment      *widget.Entry
 }
 
 var view elmFormType
@@ -27,8 +30,8 @@ var view elmFormType
 func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 
 	ztc.id = e.id.Text
-	// ztc.filePath =  // todo (путь + номер + титл)
 	ztc.title = e.Title.Text
+	// ztc.filePath =  // todo (путь + номер + титл)
 	ztc.tags = strings.Split(e.Tags.Text, "\n") // clear
 	ztc.bind = strings.Split(e.Binds.Text, "\n")
 	// ztc.bindNumbers
@@ -49,14 +52,22 @@ func (e *elmFormType) nameCardForm() *fyne.Container {
 	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карт.:"), nil, e.id)
 	e.FilePath = widget.NewEntry()
 	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Имя файла:    "), nil, e.FilePath)
+	e.Title = newFormatEntry()
+	title := container.NewBorder(nil, nil, widget.NewLabel("Тема:"), nil, e.Title)
+	top := container.NewVBox(ent1, ent2, title)
+
+	e.Text = newText()
+
+	e.Date = newFormatLabel(fmt.Sprintf("%v", time.Now().Format("2006-01-02 15:04")))
 	// + дополнительно в лейбл вывести полный путь с полным названием (путь + номер + титл)
-	okBtn := widget.NewButton("Создать карточку", func() {
+	CreateButton := widget.NewButton("Создать карточку", func() {
 		// todo: вызвать сбор всех инфы
 		ztc := e.getDataNewCard() // todo: отладить
 		fmt.Println(ztc.tags)
 	})
+	bottom := container.NewBorder(nil, nil, e.Date, CreateButton)
 
-	return container.NewVBox(ent1, ent2, okBtn)
+	return container.NewBorder(top, bottom, nil, nil, e.Text)
 }
 
 func (e *elmFormType) textForm() *fyne.Container {
@@ -76,22 +87,35 @@ func (e *elmFormType) textForm() *fyne.Container {
 
 func (e *elmFormType) addInfoForm() *fyne.Container {
 
+	e.BindNumbers = newNumericalEntry()
 	e.Tags = widget.NewMultiLineEntry()
 	e.Binds = widget.NewMultiLineEntry()
 
-	return container.NewBorder(nil, nil, nil, nil,
-		container.NewGridWithColumns(1,
-			container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags),
-			container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds)))
+	binsNumber := container.NewBorder(nil, nil, widget.NewLabel("Номера связных карт:"), nil, e.BindNumbers)
+
+	ent1 := container.NewBorder(nil, nil, nil, nil,
+		container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags))
+
+	ent2 := container.NewBorder(nil, nil, nil, nil,
+		container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds))
+
+	return container.NewBorder(binsNumber, nil, nil, nil, container.NewGridWithColumns(1, ent2, ent1))
 }
 
 func (e *elmFormType) sourceForm() *fyne.Container {
+	e.SourceNumber = newNumericalEntry()
 	e.Source = newText()
 	e.Quotation = newText()
 
-	return container.NewGridWithColumns(1,
-		container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source),
+	sourceNumber := container.NewBorder(nil, nil, widget.NewLabel("Номер карты источника:"), nil, e.SourceNumber)
+
+	ent1 := container.NewBorder(nil, nil, nil, nil,
+		container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source))
+
+	ent2 := container.NewBorder(nil, nil, nil, nil,
 		container.NewBorder(widget.NewLabel("Цитата:"), nil, nil, nil, e.Quotation))
+
+	return container.NewBorder(sourceNumber, nil, nil, nil, container.NewGridWithColumns(1, ent1, ent2))
 }
 
 func (e *elmFormType) commentForm() *fyne.Container {

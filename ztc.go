@@ -96,7 +96,6 @@ func CreateNewCard() {
 	var new elmFormType
 	tabs := container.NewAppTabs(
 		container.NewTabItem("создание", new.nameCardForm()),
-		container.NewTabItem("текст", new.textForm()), // todo: дату нужно заполнить
 		container.NewTabItem("доп.", new.addInfoForm()),
 		container.NewTabItem("источник", new.sourceForm()),
 		container.NewTabItem("коммент.", new.commentForm()),
