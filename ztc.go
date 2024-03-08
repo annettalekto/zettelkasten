@@ -90,7 +90,7 @@ func main() {
 func CreateNewCard() {
 
 	w := fyne.CurrentApp().NewWindow("Новая карточка")
-	w.Resize(fyne.NewSize(500, 400))
+	w.Resize(fyne.NewSize(800, 600))
 	w.CenterOnScreen()
 
 	var new elmFormType

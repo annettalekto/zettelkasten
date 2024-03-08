@@ -12,7 +12,7 @@ import (
 
 type elmFormType struct {
 	id           *numericalEntry
-	FilePath     *widget.Entry
+	FileName     *widget.Entry
 	Title        *widget.Entry
 	Tags         *widget.Entry
 	BindNumbers  *numericalEntry
@@ -20,7 +20,7 @@ type elmFormType struct {
 	SourceNumber *numericalEntry
 	Source       *widget.Entry
 	Text         *widget.Entry
-	Date         *widget.Label
+	Date         *widget.Entry
 	Quotation    *widget.Entry
 	Comment      *widget.Entry
 }
@@ -47,39 +47,46 @@ func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 }
 
 func (e *elmFormType) nameCardForm() *fyne.Container {
-
 	e.id = newNumericalEntry()
 	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карт.:"), nil, e.id)
-	e.FilePath = widget.NewEntry()
-	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Имя файла:    "), nil, e.FilePath)
+	e.id.Entry.OnChanged = func(s string) {
+		e.FileName.SetText(fmt.Sprintf("%s - %s", s, e.Title.Text))
+	}
 	e.Title = newFormatEntry()
 	title := container.NewBorder(nil, nil, widget.NewLabel("Тема:"), nil, e.Title)
-	top := container.NewVBox(ent1, ent2, title)
+	e.Title.OnChanged = func(s string) {
+		e.FileName.SetText(fmt.Sprintf("%s - %s", e.id.Text, s))
+	}
+	e.FileName = widget.NewEntry() // без папки
+	ent2 := container.NewBorder(nil, nil, widget.NewLabel("Имя файла:"), nil, e.FileName)
+	top := container.NewVBox(ent1, title, ent2)
 
 	e.Text = newText()
 
-	e.Date = newFormatLabel(fmt.Sprintf("%v", time.Now().Format("2006-01-02 15:04")))
+	e.Date = newFormatEntry()
+	e.Date.SetText(fmt.Sprintf("%v", time.Now().Format("2006-01-02 15:04")))
 	// + дополнительно в лейбл вывести полный путь с полным названием (путь + номер + титл)
 	CreateButton := widget.NewButton("Создать карточку", func() {
 		// todo: вызвать сбор всех инфы
 		ztc := e.getDataNewCard() // todo: отладить
 		fmt.Println(ztc.tags)
 	})
-	bottom := container.NewBorder(nil, nil, e.Date, CreateButton)
+	bottom := container.NewBorder(nil, nil, nil, CreateButton, e.Date)
 
 	return container.NewBorder(top, bottom, nil, nil, e.Text)
 }
 
 func (e *elmFormType) textForm() *fyne.Container {
 
-	e.Date = newFormatLabel(fmt.Sprintf("%v", selectedFile.data))
+	e.Date = newFormatEntry()
+	e.Date.SetText(fmt.Sprintf("%v", selectedFile.data))
 	e.Title = newFormatEntry()
 	e.Text = newText()
 	// e.Text.SetText("<Текст>")
 
 	return container.NewBorder(
 		e.Title,
-		container.NewBorder(nil, nil, e.Date, nil),
+		e.Date,
 		nil,
 		nil,
 		e.Text)
@@ -129,9 +136,11 @@ func (e *elmFormType) refreshTabs(z ztcBasicsType) {
 
 	e.Date.SetText(fmt.Sprintf("%v", z.data.Format("2006-01-02 15:04")))
 	e.Title.SetText(z.title)
-	e.Tags.SetText(formatSlice(z.tags))
-	e.Binds.SetText(formatSlice(z.bind))
-	e.Source.SetText(formatSlice(z.source))
+	e.Tags.SetText(sliceInColumn(z.tags))
+	e.Binds.SetText(sliceInColumn(z.bind))
+	e.BindNumbers.SetText(sliceInString(z.bindNumbers))
+	e.SourceNumber.SetText(sliceInString(z.sourceNumber))
+	e.Source.SetText(sliceInColumn(z.source))
 	e.Text.SetText(getTextFromFile(z.filePath))
 	e.Quotation.SetText(getQuotationFromFile(z.filePath))
 	e.Comment.SetText(getCommentFromFile(z.filePath))

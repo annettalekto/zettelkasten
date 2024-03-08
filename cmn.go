@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
@@ -24,9 +26,16 @@ func newText() *widget.Entry {
 	return t
 }
 
-func formatSlice(sl []string) (text string) {
+func sliceInColumn(sl []string) (text string) {
 	for _, s := range sl {
 		text += s + "\n"
 	}
-	return
+	return strings.TrimSuffix(text, "\n")
+}
+
+func sliceInString(sl []string) (text string) {
+	for _, s := range sl {
+		text += s + ", "
+	}
+	return strings.TrimSuffix(text, ", ")
 }
