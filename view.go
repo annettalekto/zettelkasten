@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -28,22 +30,39 @@ type elmFormType struct {
 var view elmFormType
 
 func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
+	var err error
 
 	ztc.id = e.id.Text
 	ztc.title = e.Title.Text
-	// ztc.filePath =  // todo (путь + номер + титл)
-	ztc.tags = strings.Split(e.Tags.Text, "\n") // clear
+	ztc.filePath = e.FileName.Text
+	ztc.tags = strings.Split(e.Tags.Text, "\n")
 	ztc.bind = strings.Split(e.Binds.Text, "\n")
-	// ztc.bindNumbers
+	ztc.bindNumbers = strings.Split(e.BindNumbers.Text, ", ")
 	ztc.source = strings.Split(e.Source.Text, "\n")
-	// ztc.sourceNumber
-
-	// ztc.data
-
+	ztc.sourceNumber = strings.Split(e.SourceNumber.Text, ", ")
+	ztc.data, err = time.Parse("2006-01-02 15:04", e.Date.Text)
+	if err != nil {
+		fmt.Println("ошибочка")
+	}
+	// text
 	// quotation
 	// comment
+	// todo: запись в файл
+	createCard(ztc) //не отдельным фйалом. сразу из формы в файл тк кнопка создать уже нажата
 
 	return ztc
+}
+
+func createCard(ztc ztcBasicsType) { // передавать ссылкой? в другой файл?
+
+	file, err := os.Create(filepath.Join(gFilePath, ztc.filePath+".md"))
+	if err != nil {
+		fmt.Println("Ошибка записи файла")
+		return
+	}
+	defer file.Close()
+
+	file.WriteString("<!-- title -->\n" + "#### " + ztc.title + "\n<!-- /title -->\n")
 }
 
 func (e *elmFormType) nameCardForm() *fyne.Container {

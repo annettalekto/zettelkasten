@@ -17,6 +17,7 @@ type ztcBasicsType struct {
 	bindNumbers  []string
 	bind         []string
 	data         time.Time
+	// text
 	// quotation    string
 	// comment      string
 }
