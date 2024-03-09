@@ -29,40 +29,55 @@ type elmFormType struct {
 
 var view elmFormType
 
-func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
-	var err error
-
-	ztc.id = e.id.Text
-	ztc.title = e.Title.Text
-	ztc.filePath = e.FileName.Text
-	ztc.tags = strings.Split(e.Tags.Text, "\n")
-	ztc.bind = strings.Split(e.Binds.Text, "\n")
-	ztc.bindNumbers = strings.Split(e.BindNumbers.Text, ", ")
-	ztc.source = strings.Split(e.Source.Text, "\n")
-	ztc.sourceNumber = strings.Split(e.SourceNumber.Text, ", ")
-	ztc.data, err = time.Parse("2006-01-02 15:04", e.Date.Text)
-	if err != nil {
-		fmt.Println("ошибочка")
-	}
-	// text
-	// quotation
-	// comment
-	// todo: запись в файл
-	createCard(ztc) //не отдельным фйалом. сразу из формы в файл тк кнопка создать уже нажата
-
-	return ztc
-}
-
-func createCard(ztc ztcBasicsType) { // передавать ссылкой? в другой файл?
-
-	file, err := os.Create(filepath.Join(gFilePath, ztc.filePath+".md"))
+func (e *elmFormType) createCard() {
+	file, err := os.Create(filepath.Join(gFilePath, e.FileName.Text+".md"))
 	if err != nil {
 		fmt.Println("Ошибка записи файла")
 		return
 	}
 	defer file.Close()
 
-	file.WriteString("<!-- title -->\n" + "#### " + ztc.title + "\n<!-- /title -->\n")
+	file.WriteString("<!-- title -->" + "#### " + e.Title.Text + "<!-- /title -->\n")
+	file.WriteString("<!-- tags -->" + e.Tags.Text + "<!-- /tags -->\n")
+	file.WriteString("<!-- text -->" + e.Text.Text + "<!-- /text -->\n")
+
+	source := strings.Split(e.Source.Text, "\n")
+	file.WriteString("<!-- source -->" + "_источник:_ " + e.SourceNumber.Text + "\n")
+	for _, s := range source {
+		file.WriteString("[[" + s + "]]\n")
+	}
+	file.WriteString("\n<!-- /source -->\n")
+
+	binds := strings.Split(e.Binds.Text, "\n")
+	file.WriteString("<!-- bind-->" + "_связное:_  " + e.BindNumbers.Text + "\n")
+	for _, b := range binds {
+		file.WriteString("[[" + b + "]]\n")
+	}
+	file.WriteString("\n<!-- /bind -->")
+
+	file.WriteString("<!-- id -->" + " _номер:_ " + e.id.Text + " <!-- /id -->\n")
+	file.WriteString("<!-- date --> " + e.Date.Text + " <!-- /date -->\n")
+	file.WriteString("\n___\n")
+
+	file.WriteString("<!-- quotation -->" + e.Quotation.Text + "<!-- /quotation -->\n")
+	file.WriteString("<!-- comment -->" + e.Comment.Text + "<!-- /comment -->\n")
+	// file.WriteString()
+
+	// ztc.id = e.id.Text
+	// ztc.title =
+	// ztc.filePath = e.FileName.Text
+	// ztc.tags = strings.Split(e.Tags.Text, "\n")
+	// ztc.bind = strings.Split(e.Binds.Text, "\n")
+	// ztc.bindNumbers = strings.Split(e.BindNumbers.Text, ", ")
+	// ztc.source = strings.Split(e.Source.Text, "\n")
+	// ztc.sourceNumber = strings.Split(e.SourceNumber.Text, ", ")
+	// ztc.data, err = time.Parse("2006-01-02 15:04", e.Date.Text)
+	// if err != nil {
+	// 	fmt.Println("ошибочка")
+	// }
+	// text
+	// quotation
+	// comment
 }
 
 func (e *elmFormType) nameCardForm() *fyne.Container {
@@ -84,11 +99,9 @@ func (e *elmFormType) nameCardForm() *fyne.Container {
 
 	e.Date = newFormatEntry()
 	e.Date.SetText(fmt.Sprintf("%v", time.Now().Format("2006-01-02 15:04")))
-	// + дополнительно в лейбл вывести полный путь с полным названием (путь + номер + титл)
+
 	CreateButton := widget.NewButton("Создать карточку", func() {
-		// todo: вызвать сбор всех инфы
-		ztc := e.getDataNewCard() // todo: отладить
-		fmt.Println(ztc.tags)
+		e.createCard() // true?
 	})
 	bottom := container.NewBorder(nil, nil, nil, CreateButton, e.Date)
 

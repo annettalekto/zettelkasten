@@ -7,11 +7,11 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func newFormatLabel(name string) *widget.Label {
-	l := widget.NewLabel(name)
-	l.TextStyle.Monospace = true
-	return l
-}
+// func newFormatLabel(name string) *widget.Label {
+// 	l := widget.NewLabel(name)
+// 	l.TextStyle.Monospace = true
+// 	return l
+// }
 
 func newFormatEntry() *widget.Entry {
 	en := widget.NewEntry()
