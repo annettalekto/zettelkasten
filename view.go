@@ -48,12 +48,12 @@ func (e *elmFormType) getDataNewCard() (ztc ztcBasicsType) {
 
 func (e *elmFormType) nameCardForm() *fyne.Container {
 	e.id = newNumericalEntry()
-	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карт.:"), nil, e.id)
+	ent1 := container.NewBorder(nil, nil, widget.NewLabel("Номер карты:"), nil, e.id)
 	e.id.Entry.OnChanged = func(s string) {
 		e.FileName.SetText(fmt.Sprintf("%s - %s", s, e.Title.Text))
 	}
 	e.Title = newFormatEntry()
-	title := container.NewBorder(nil, nil, widget.NewLabel("Тема:"), nil, e.Title)
+	title := container.NewBorder(nil, nil, widget.NewLabel("Название:"), nil, e.Title)
 	e.Title.OnChanged = func(s string) {
 		e.FileName.SetText(fmt.Sprintf("%s - %s", e.id.Text, s))
 	}
@@ -102,6 +102,12 @@ func (e *elmFormType) addInfoForm() *fyne.Container {
 
 	ent1 := container.NewBorder(nil, nil, nil, nil,
 		container.NewBorder(widget.NewLabel("Теги:"), nil, nil, nil, e.Tags))
+	e.Tags.SetText("#")
+	e.Tags.OnChanged = func(s string) {
+		if s[len(s)-1] == '\n' {
+			e.Tags.SetText(s + "#")
+		}
+	}
 
 	ent2 := container.NewBorder(nil, nil, nil, nil,
 		container.NewBorder(widget.NewLabel("Связное:"), nil, nil, nil, e.Binds))
@@ -115,7 +121,7 @@ func (e *elmFormType) sourceForm() *fyne.Container {
 	e.Quotation = newText()
 
 	sourceNumber := container.NewBorder(nil, nil, widget.NewLabel("Номер карты источника:"), nil, e.SourceNumber)
-
+	// todo: найти по номеру карту и подставить имя в поле ниже
 	ent1 := container.NewBorder(nil, nil, nil, nil,
 		container.NewBorder(widget.NewLabel("Источники:"), nil, nil, nil, e.Source))
 
