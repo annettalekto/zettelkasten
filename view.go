@@ -37,31 +37,30 @@ func (e *elmFormType) createCard() {
 	}
 	defer file.Close()
 
-	file.WriteString("<!-- title -->" + "#### " + e.Title.Text + "<!-- /title -->\n")
-	file.WriteString("<!-- tags -->" + e.Tags.Text + "<!-- /tags -->\n")
-	file.WriteString("<!-- text -->" + e.Text.Text + "<!-- /text -->\n")
+	file.WriteString("<!-- title -->\n" + "#### " + e.Title.Text + "\n<!-- /title -->\n\n")
+	file.WriteString("<!-- tags -->\n" + e.Tags.Text + "\n<!-- /tags -->\n\n")
+	file.WriteString("<!-- text -->\n" + e.Text.Text + "\n<!-- /text -->\n\n")
 
 	source := strings.Split(e.Source.Text, "\n")
-	file.WriteString("<!-- source -->" + "_источник:_ " + e.SourceNumber.Text + "\n")
+	file.WriteString("<!-- source -->\n" + "_источник:_ " + e.SourceNumber.Text + "\n")
 	for _, s := range source {
 		file.WriteString("[[" + s + "]]\n")
 	}
-	file.WriteString("\n<!-- /source -->\n")
+	file.WriteString("\n<!-- /source -->\n\n")
 
 	binds := strings.Split(e.Binds.Text, "\n")
-	file.WriteString("<!-- bind-->" + "_связное:_  " + e.BindNumbers.Text + "\n")
+	file.WriteString("<!-- bind-->\n" + "_связное:_  " + e.BindNumbers.Text + "\n")
 	for _, b := range binds {
 		file.WriteString("[[" + b + "]]\n")
 	}
-	file.WriteString("\n<!-- /bind -->")
+	file.WriteString("\n<!-- /bind -->\n\n")
 
 	file.WriteString("<!-- id -->" + " _номер:_ " + e.id.Text + " <!-- /id -->\n")
 	file.WriteString("<!-- date --> " + e.Date.Text + " <!-- /date -->\n")
-	file.WriteString("\n___\n")
+	file.WriteString("\n___\n\n")
 
-	file.WriteString("<!-- quotation -->" + e.Quotation.Text + "<!-- /quotation -->\n")
-	file.WriteString("<!-- comment -->" + e.Comment.Text + "<!-- /comment -->\n")
-	// file.WriteString()
+	file.WriteString("<!-- quotation -->\n" + e.Quotation.Text + "\n<!-- /quotation -->\n\n")
+	file.WriteString("<!-- comment -->\n" + e.Comment.Text + "\n<!-- /comment -->\n")
 
 	// ztc.id = e.id.Text
 	// ztc.title =
