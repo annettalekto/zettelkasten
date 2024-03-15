@@ -61,22 +61,6 @@ func (e *elmFormType) createCard() {
 
 	file.WriteString("<!-- quotation -->\n" + e.Quotation.Text + "\n<!-- /quotation -->\n\n")
 	file.WriteString("<!-- comment -->\n" + e.Comment.Text + "\n<!-- /comment -->\n")
-
-	// ztc.id = e.id.Text
-	// ztc.title =
-	// ztc.filePath = e.FileName.Text
-	// ztc.tags = strings.Split(e.Tags.Text, "\n")
-	// ztc.bind = strings.Split(e.Binds.Text, "\n")
-	// ztc.bindNumbers = strings.Split(e.BindNumbers.Text, ", ")
-	// ztc.source = strings.Split(e.Source.Text, "\n")
-	// ztc.sourceNumber = strings.Split(e.SourceNumber.Text, ", ")
-	// ztc.data, err = time.Parse("2006-01-02 15:04", e.Date.Text)
-	// if err != nil {
-	// 	fmt.Println("ошибочка")
-	// }
-	// text
-	// quotation
-	// comment
 }
 
 func (e *elmFormType) nameCardForm() *fyne.Container {
@@ -113,11 +97,15 @@ func (e *elmFormType) textForm() *fyne.Container {
 	e.Date.SetText(fmt.Sprintf("%v", selectedFile.data))
 	e.Title = newFormatEntry()
 	e.Text = newText()
-	// e.Text.SetText("<Текст>")
+
+	btnSave := widget.NewButton("Сохранить изменения", nil) // todo: сохранить в структуру, обновить файл
+	btnOpen := widget.NewButton("Открыть в редакторе", nil) // todo: обноить структуру, открыть в большом редакторе
+
+	btn := container.NewBorder(nil, nil, btnOpen, btnSave)
 
 	return container.NewBorder(
 		e.Title,
-		e.Date,
+		container.NewVBox(e.Date, btn),
 		nil,
 		nil,
 		e.Text)

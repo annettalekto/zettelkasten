@@ -55,8 +55,8 @@ func main() {
 
 	menu := fyne.NewMainMenu(
 		fyne.NewMenu("Файл",
-			fyne.NewMenuItem("Создать новую карточку", nil), // +F2 и  кнопку на редактирование todo:
-			fyne.NewMenuItem("Редактировать файл", nil),
+			fyne.NewMenuItem("Создать новую карточку", func() { CreateNewCard() }), // +F2 и  кнопку на редактирование todo:
+			//fyne.NewMenuItem("Редактировать файл", nil),
 			fyne.NewMenuItem("Изменить каталог", nil),
 			fyne.NewMenuItemSeparator(),
 			fyne.NewMenuItem("Список тегов", nil),
@@ -187,10 +187,14 @@ func mainForm() (box *fyne.Container) {
 		view.refreshTabs(selectedFile)
 	}
 
-	btnCreate := widget.NewButton("Создать", func() {
+	// правая часть
+	dir := widget.NewLabel(gFilePath)
+
+	btnCreate := widget.NewButton("Создать новую карточку", func() {
 		CreateNewCard()
 	})
-	btns := container.NewVBox(btnCreate)
+
+	btns := container.NewVBox(dir, btnCreate)
 	split := container.NewHSplit(list, btns)
 	box = container.NewBorder(nil, nil, nil, nil, split)
 
